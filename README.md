@@ -6,7 +6,7 @@ TrackIt is a modern personal finance management application designed to help use
 
 - **client/**: Contains the React frontend application (fully functional).
 - **server/**: (To be developed) Will contain the backend API and business logic.
-
+- **hello/**
 ## Status
 
 - The **client** (React app) is implemented and provides a rich user interface for managing and visualizing personal finances.
