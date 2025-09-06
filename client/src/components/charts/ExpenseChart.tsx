@@ -94,7 +94,7 @@ export function ExpenseChart() {
       <div className="chart-container bg-expense/10 border-2 border-expense/20 flex flex-col items-center justify-center rounded-xl p-4 w-full sm:w-1/2">
         <div className="text-center mb-4">
           <h2 className="text-lg font-bold">Expense Distribution</h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm font-semibold text-muted-foreground">
             A breakdown of your expenses by category
           </p>
         </div>
@@ -114,6 +114,7 @@ export function ExpenseChart() {
               cornerRadius={100}
               dataKey="total"
               nameKey="category"
+              animationDuration={0}
             />
           </PieChart>
         </ChartContainer>

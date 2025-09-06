@@ -94,7 +94,7 @@ export function SavingsChart() {
       <div className="chart-container bg-savings/10 border-2 border-savings/20 flex flex-col items-center justify-center rounded-xl p-4 w-full sm:w-1/2">
         <div className="text-center mb-4">
           <h2 className="text-lg font-bold">Savings Distribution</h2>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm font-semibold text-muted-foreground">
             A breakdown of your savings by category
           </p>
         </div>
@@ -114,6 +114,7 @@ export function SavingsChart() {
               cornerRadius={100}
               dataKey="total"
               nameKey="category"
+              animationDuration={0}
             />
           </PieChart>
         </ChartContainer>

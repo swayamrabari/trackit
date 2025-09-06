@@ -152,70 +152,73 @@ export default function Summary() {
               </div>
             </div>
           </div>
-          <div className="line h-2 flex gap-1  rounded-full box-content p-1 ">
-            <div
-              className="expense h-full bg-expense transition-all duration-1000 rounded-full"
-              style={{
-                width: `${Math.min(Math.max(expensePercent, 2), 100)}%`,
-              }}
-            />
-            <div
-              className="investment h-full bg-investment transition-all duration-1000 rounded-full"
-              style={{
-                width: `${Math.min(Math.max(investmentPercent, 2), 100)}%`,
-              }}
-            />
-            <div
-              className="savings h-full bg-savings transition-all duration-1000 rounded-full"
-              style={{
-                width: `${Math.min(Math.max(savingsPercent, 2), 100)}%`,
-              }}
-            />
+          <div className="h-2 line flex gap-1 rounded-full box-content">
+            {[
+              { percent: expensePercent, className: 'bg-expense' },
+              { percent: investmentPercent, className: 'bg-investment' },
+              { percent: savingsPercent, className: 'bg-savings' },
+            ].map((item, index) => (
+              <div
+                key={index}
+                className={`h-full transition-all duration-1000 rounded-full ${item.className} bg-opacity-85`}
+                style={{
+                  width: `${Math.min(Math.max(item.percent, 2), 100)}%`,
+                }}
+              />
+            ))}
           </div>
         </div>
       </div>
       <div className="summary-report font-bold grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-7 md:grid-cols-4 md:gap-5 mt-5 sm:mt-5">
-        <div className="income py-3 px-4 sm:border-none bg-income/15 rounded-lg">
-          <div className="title text-base mb-1 text-income">Income</div>
-          <div className="amount text-xl font-bold text-foreground">
-            {filteredData.income.toLocaleString('en-IN', {
-              minimumFractionDigits: 2,
-            })}
+        {[
+          {
+            key: 'income',
+            title: 'Income',
+            amount: filteredData.income,
+            percentage: null,
+            textClass: 'text-income',
+          },
+          {
+            key: 'expense',
+            title: 'Expense',
+            amount: filteredData.expense,
+            percentage: expensePercent.toFixed(2),
+            textClass: 'text-expense',
+          },
+          {
+            key: 'investment',
+            title: 'Investment',
+            amount: filteredData.investment,
+            percentage: investmentPercent.toFixed(2),
+            textClass: 'text-investment',
+          },
+          {
+            key: 'savings',
+            title: 'Savings',
+            amount: filteredData.savings,
+            percentage: savingsPercent.toFixed(2),
+            textClass: 'text-savings',
+          },
+        ].map((item) => (
+          <div
+            key={item.key}
+            className={`py-2.5 px-4 bg-${item.key}/10 border-2 border-${item.key}/20 rounded-lg`}
+          >
+            <div
+              className={`text-base mb-1 ${item.textClass} flex items-center justify-between`}
+            >
+              <div className="title">{item.title}</div>
+              {item.percentage && (
+                <div className="percentage">{item.percentage}%</div>
+              )}
+            </div>
+            <div className="amount text-xl font-bold text-foreground">
+              {item.amount.toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+              })}
+            </div>
           </div>
-        </div>
-        <div className="expense py-3 px-4 sm:border-none bg-expense/15  rounded-lg">
-          <div className="text-base mb-1 text-expense flex items-center justify-between">
-            <div className="title">Expense</div>
-            <div className="percentage">{expensePercent.toFixed(2)}%</div>
-          </div>
-          <div className="amount text-xl font-bold text-foreground">
-            {filteredData.expense.toLocaleString('en-IN', {
-              minimumFractionDigits: 2,
-            })}
-          </div>
-        </div>
-        <div className="investment py-3 px-4 sm:border-none bg-investment/15 rounded-lg">
-          <div className="text-base mb-1 text-investment flex items-center justify-between">
-            <div className="title">Investment</div>
-            <div className="percentage">{investmentPercent.toFixed(2)}%</div>
-          </div>
-          <div className="amount text-xl font-bold text-foreground">
-            {filteredData.investment.toLocaleString('en-IN', {
-              minimumFractionDigits: 2,
-            })}
-          </div>
-        </div>
-        <div className="savings py-3 px-4 sm:border-none bg-savings/15  rounded-lg">
-          <div className="text-base mb-1 text-savings flex items-center justify-between">
-            <div className="title">Savings</div>
-            <div className="percentage">{savingsPercent.toFixed(2)}%</div>
-          </div>
-          <div className="amount text-xl font-bold text-foreground">
-            {filteredData.savings.toLocaleString('en-IN', {
-              minimumFractionDigits: 2,
-            })}
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

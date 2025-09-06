@@ -3,12 +3,10 @@ import { useEntriesStore } from './entriesStore';
 
 export interface Budget {
   id: string;
-  type: 'expense' | 'savings' | 'investment';
+  type: string;
   category: string;
   amount: number;
-  period: 'monthly' | 'quarterly' | 'yearly';
-  startDate: string;
-  name: string;
+  period: string;
 }
 
 interface BudgetStore {
@@ -28,8 +26,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'groceries',
       amount: 18000,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Groceries',
     },
     {
       id: '2',
@@ -37,8 +33,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'entertainment',
       amount: 6000,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Entertainment',
     },
     {
       id: '3',
@@ -46,8 +40,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'utilities',
       amount: 4000,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Utilities',
     },
     {
       id: '4',
@@ -55,8 +47,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'transport',
       amount: 3500,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Transport',
     },
     {
       id: '5',
@@ -64,8 +54,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'shopping',
       amount: 8000,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Shopping',
     },
     {
       id: '6',
@@ -73,8 +61,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'health',
       amount: 2500,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Health',
     },
     {
       id: '7',
@@ -82,8 +68,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'emergency fund',
       amount: 12000,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Emergency Fund',
     },
     {
       id: '8',
@@ -91,8 +75,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'vacation',
       amount: 5000,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Vacation Savings',
     },
     {
       id: '9',
@@ -100,8 +82,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'retirement',
       amount: 7000,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Retirement Savings',
     },
     {
       id: '10',
@@ -109,8 +89,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'gifts',
       amount: 2000,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Gift Savings',
     },
     {
       id: '11',
@@ -118,8 +96,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'stocks',
       amount: 15000,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Stocks',
     },
     {
       id: '12',
@@ -127,8 +103,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'mutual funds',
       amount: 10000,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Mutual Funds',
     },
     {
       id: '13',
@@ -136,8 +110,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'crypto',
       amount: 3000,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Crypto',
     },
     {
       id: '14',
@@ -145,8 +117,6 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'real estate',
       amount: 20000,
       period: 'quarterly',
-      startDate: '2024-04-01',
-      name: 'Real Estate',
     },
     {
       id: '15',
@@ -154,8 +124,20 @@ export const useBudgetStore = create<BudgetStore>((set, get) => {
       category: 'subscriptions',
       amount: 1200,
       period: 'monthly',
-      startDate: '2024-06-01',
-      name: 'Subscriptions',
+    },
+    {
+      id: '16',
+      type: 'investment',
+      category: 'bonds',
+      amount: 8000,
+      period: 'monthly',
+    },
+    {
+      id: '17',
+      type: 'investment',
+      category: 'gold',
+      amount: 5000,
+      period: 'monthly',
     },
   ];
 
@@ -192,47 +174,58 @@ export function calculateBudgetProgress(budget: Budget): {
   progress: number;
   remaining: number;
 } {
-  const entries = useEntriesStore.getState().entries;
+  // Get all entries from the entries store
+  const entries = useEntriesStore.getState().getEntries();
 
-  // Get the current month, quarter, or year start/end dates
-  const now = new Date();
-  let periodStart: Date, periodEnd: Date;
+  // Filter entries by type and category that match the budget
+  const relevantEntries = entries.filter(
+    (entry) => entry.type === budget.type && entry.category === budget.category
+  );
 
-  switch (budget.period) {
-    case 'monthly':
-      periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      break;
-    case 'quarterly': {
-      const quarter = Math.floor(now.getMonth() / 3);
-      periodStart = new Date(now.getFullYear(), quarter * 3, 1);
-      periodEnd = new Date(now.getFullYear(), quarter * 3 + 3, 0);
-      break;
-    }
-    case 'yearly':
-      periodStart = new Date(now.getFullYear(), 0, 1);
-      periodEnd = new Date(now.getFullYear(), 11, 31);
-      break;
+  // Calculate current period based on today and budget.period
+  const currentDate = new Date();
+  const periodStart = new Date(currentDate);
+  let periodEnd = new Date(currentDate);
+
+  if (budget.period === 'monthly') {
+    periodStart.setDate(1);
+    periodStart.setHours(0, 0, 0, 0);
+    periodEnd = new Date(periodStart);
+    periodEnd.setMonth(periodEnd.getMonth() + 1);
+  } else if (budget.period === 'quarterly') {
+    const currentMonth = currentDate.getMonth();
+    const quarterStartMonth = currentMonth - (currentMonth % 3);
+    periodStart.setMonth(quarterStartMonth, 1);
+    periodStart.setHours(0, 0, 0, 0);
+    periodEnd = new Date(periodStart);
+    periodEnd.setMonth(periodEnd.getMonth() + 3);
+  } else if (budget.period === 'yearly') {
+    periodStart.setMonth(0, 1);
+    periodStart.setHours(0, 0, 0, 0);
+    periodEnd = new Date(periodStart);
+    periodEnd.setFullYear(periodEnd.getFullYear() + 1);
+  } else if (budget.period === 'half-yearly') {
+    const currentMonth = currentDate.getMonth();
+    const halfStartMonth = currentMonth < 6 ? 0 : 6;
+    periodStart.setMonth(halfStartMonth, 1);
+    periodStart.setHours(0, 0, 0, 0);
+    periodEnd = new Date(periodStart);
+    periodEnd.setMonth(periodEnd.getMonth() + 6);
   }
 
-  // Filter entries by type, category, and period
-  const relevantEntries = entries.filter((entry) => {
+  // Filter entries by date range
+  const entriesInPeriod = relevantEntries.filter((entry) => {
     const entryDate = new Date(entry.date);
-    return (
-      entry.type === budget.type &&
-      entry.category === budget.category &&
-      entryDate >= periodStart &&
-      entryDate <= periodEnd
-    );
+    return entryDate >= periodStart && entryDate < periodEnd;
   });
 
-  // Calculate current spending
-  const currentSpending = relevantEntries.reduce(
+  // Calculate total spending for the period
+  const currentSpending = entriesInPeriod.reduce(
     (total, entry) => total + entry.amount,
     0
   );
 
-  // Calculate progress percentage (cap at 100%)
+  // Calculate progress percentage
   const progress = Math.min(
     Math.round((currentSpending / budget.amount) * 100),
     100
