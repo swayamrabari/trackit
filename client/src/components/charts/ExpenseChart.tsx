@@ -114,7 +114,6 @@ export function ExpenseChart() {
               cornerRadius={100}
               dataKey="total"
               nameKey="category"
-              animationDuration={0}
             />
           </PieChart>
         </ChartContainer>

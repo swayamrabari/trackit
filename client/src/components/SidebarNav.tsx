@@ -4,10 +4,11 @@ import navOptions from '../constants/navOtions';
 import AddEntry from './AddEntry';
 import AddBudgetDialog from './budget/AddBudgetDialog';
 import { useBudgetStore } from '@/store/budgetStore';
+import { useAuthStore } from '@/store/authStore';
 
 export default function SidebarNav() {
   const addBudget = useBudgetStore((s) => s.addBudget);
-
+  const user = useAuthStore((s) => s.user);
   return (
     <aside className="hidden tracking-normal lg:flex flex-col h-svh w-64 bg-sidebar border-r border-border top-0">
       <div className="px-6 py-7 flex items-center gap-3">
@@ -51,15 +52,19 @@ export default function SidebarNav() {
         </div>
       </div>
       {/* Avatar */}
-      {/* <div className="profile p-5 border-t border-border">
-        <div className="avatar h-10 w-10 bg-muted/50 rounded-full flex items-center justify-center">
-          <div className="flex h-full w-full items-center justify-center rounded-full bg-secondary">
-            <span className="text-secondary-foreground/80 font-semibold text-base">
-              SR
+      <div className="mt-auto p-2">
+        <div className="flex items-center gap-3 p-4 bg-secondary rounded-md">
+          <div className="h-10 w-10 rounded-full bg-foreground text-secondary text-xl flex items-center justify-center font-bold">
+            {user?.name.charAt(0).toUpperCase()}
+          </div>
+          <div className="flex flex-col gap-[-5px]">
+            <span className="font-semibold">{user?.name}</span>
+            <span className="text-sm font-semibold text-muted-foreground">
+              {user?.email}
             </span>
           </div>
         </div>
-      </div> */}
+      </div>
     </aside>
   );
 }

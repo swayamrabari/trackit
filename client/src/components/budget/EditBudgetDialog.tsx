@@ -7,6 +7,7 @@ import {
   Dialog,
   DialogContent,
   DialogHeader,
+  DialogDescription,
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -76,8 +77,11 @@ export function EditBudgetDialog({
       <DialogContent className="w-full max-h-full sm:w-[400px] overflow-auto">
         <DialogHeader className="mb-2">
           <DialogTitle>Edit Budget</DialogTitle>
+          <DialogDescription>
+            Make changes to your budget here.
+          </DialogDescription>
         </DialogHeader>
-        <form className="flex flex-col gap-3 mt-2" onSubmit={handleSubmit}>
+        <form className="flex flex-col gap-3" onSubmit={handleSubmit}>
           <Input
             type="number"
             min={0}
