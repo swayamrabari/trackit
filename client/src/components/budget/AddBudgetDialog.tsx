@@ -80,7 +80,7 @@ export default function AddBudgetDialog({
     >
       {inSidebar ? (
         <DialogTrigger asChild>
-          <div className="transition-all font-medium w-full flex gap-2 hover:bg-secondary cursor-pointer items-center justify-start px-3 py-2 rounded-md">
+          <div className="transition-all font-medium w-full flex gap-2 hover:bg-secondary cursor-pointer items-center justify-start px-2.5 py-2 rounded-md">
             <img
               src={AddBudgetSvg}
               alt="Add Entry"

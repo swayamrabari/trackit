@@ -18,17 +18,21 @@ export default function Register() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    toast.loading('Registering...', { id: 'register' });
     clearError();
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error("Passwords don't match", { id: 'register' });
       return;
     }
     try {
       await register(name, email, password);
-      toast.success('Check your email for OTP verification');
+      // short message
+      toast.success('Verification code sent to your mail!', {
+        id: 'register',
+      });
       navigate('/verify', { state: { email } });
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Registration Failed');
+      toast.error(err.message || 'Something went wrong', { id: 'register' });
     }
   };
 

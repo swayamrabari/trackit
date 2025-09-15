@@ -11,10 +11,13 @@ exports.registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
     const userExists = await User.findOne({ email });
-    const pendingExists = await PendingUser.findOne({ email });
-    if (userExists || pendingExists) {
-      return res.status(400).json({ message: 'User already exists' });
+    if (userExists) {
+      return res
+        .status(400)
+        .json({ message: 'User with this email already exists' });
     }
+
+    await PendingUser.deleteOne({ email });
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);

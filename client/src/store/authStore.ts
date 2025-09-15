@@ -116,7 +116,6 @@ export const useAuthStore = create<AuthState>()(
             isLoading: false,
           });
         } catch (error) {
-          console.log('Auth failed:', error);
           set({
             user: null,
             isAuthenticated: false,

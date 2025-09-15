@@ -1,88 +1,100 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
-import navOptions from "../constants/navOtions";
-import AddEntry from "./AddEntry";
-import AddBudgetDialog from "./budget/AddBudgetDialog";
-import { useBudgetStore } from "@/store/budgetStore";
-import { useAuthStore } from "@/store/authStore";
-import { useNavigate } from "react-router-dom";
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import navOptions from '../constants/navOtions';
+import AddEntry from './AddEntry';
+import AddBudgetDialog from './budget/AddBudgetDialog';
+import { useBudgetStore } from '@/store/budgetStore';
+import { useAuthStore } from '@/store/authStore';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { EllipsisVertical, LogOut, Settings } from 'lucide-react';
 
 export default function SidebarNav() {
   const addBudget = useBudgetStore((s) => s.addBudget);
   const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
-  const navigate = useNavigate();
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
-
   return (
-    <aside className="hidden lg:flex flex-col h-screen w-64 bg-sidebar border-r border-border">
-      {/* Logo Section */}
-      <div className="px-6 py-6 flex items-center gap-3 border-b border-border">
+    <aside className="hidden tracking-normal lg:flex flex-col h-svh w-64 bg-sidebar border-r border-border top-0">
+      <div className="px-6 py-7 flex items-center gap-3">
         <img src="/trackit.svg" alt="Trackit Logo" className="h-8" />
-        <h1 className="text-xl font-bold tracking-wide text-white">TrackIt</h1>
+        <h1 className="text-[1.35rem] font-logo font-semibold tracking-wide">
+          TrackIt
+        </h1>
       </div>
-
       {/* Navigation */}
-      <div className="flex flex-col flex-1 overflow-y-auto">
-        <div className="mt-4 mb-2 px-6 text-xs uppercase font-semibold text-muted-foreground">
+      <div className="workspace flex flex-col">
+        <span className="px-6 text-xs tracking-wide font-semibold text-muted-foreground">
           Workspace
-        </div>
-        <nav className="flex flex-col space-y-1 px-3">
+        </span>
+        <nav className="flex flex-col w-full overflow-y px-2.5 py-1">
           {navOptions.map((option) => (
             <NavLink
               key={option.label}
               to={option.path}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-2 text-sm rounded-lg font-medium transition ${
-                  isActive
-                    ? "bg-secondary text-white shadow-sm"
-                    : "text-muted-foreground hover:bg-secondary/30"
+                `transition-all font-semibold w-full flex gap-2 items-center px-2.5 py-2 rounded-md ${
+                  isActive ? 'bg-secondary' : ''
                 }`
               }
             >
               {React.cloneElement(option.icon, {
-                className: "h-5 w-5",
+                className: 'h-[20px]',
               })}
-              <span>{option.label}</span>
+              <span className="text-base font-medium">{option.label}</span>
             </NavLink>
           ))}
         </nav>
-
-        {/* Actions */}
-        <div className="mt-6 mb-2 px-6 text-xs uppercase font-semibold text-muted-foreground">
+      </div>
+      <div className="actions mt-2">
+        <span className="px-6 text-xs tracking-wide font-semibold text-muted-foreground">
           Actions
-        </div>
-        <div className="px-3 space-y-2">
+        </span>
+        {/* display here add entry and budget dialogue triggers */}
+        <div className="px-2.5 py-1 flex flex-col select-none">
           <AddEntry inSidebar />
           <AddBudgetDialog onAdd={addBudget} inSidebar />
         </div>
       </div>
-
-      {/* User Profile */}
-      <div className="mt-auto border-t border-border p-4">
-        <div className="flex items-center gap-3">
-          {/* Avatar */}
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 text-white flex items-center justify-center font-bold">
-            {user?.name?.charAt(0).toUpperCase()}
+      {/* Avatar */}
+      <div className="mt-auto profile-card p-3">
+        <div className="relative overflow-hidden group flex items-center gap-3 p-3 bg-secondary rounded-md">
+          <div className="absolute z-50 bg-gradient-to-l from-secondary from-70% to-transparent h-full w-14 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Popover>
+              <PopoverTrigger className="w-full flex items-center justify-center h-full ml-1.5">
+                <EllipsisVertical />
+              </PopoverTrigger>
+              <PopoverContent className="w-40 p-1.5 rounded-lg">
+                <div className="flex flex-col gap-1.5">
+                  <div
+                    className="flex text-expense font-semibold text-sm gap-2 items-center cursor-pointer bg-expense/15 hover:bg-expense/10 transition-all rounded-md p-2"
+                    onClick={() => useAuthStore.getState().logout()}
+                  >
+                    <LogOut className="inline h-5 w-5" />
+                    <span onClick={() => useAuthStore.getState().logout()}>
+                      Logout
+                    </span>
+                  </div>
+                  <div className="flex text-foreground font-medium text-sm gap-2 items-center cursor-pointer bg-muted hover:bg-muted/80 transition-all rounded-md p-2">
+                    <Settings className="inline h-5 w-5" />
+                    <span>Settings</span>
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
-
-          {/* User Info */}
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold">{user?.name}</span>
-            <span className="text-xs text-muted-foreground">{user?.email}</span>
+          <div className="h-10 w-10 flex-shrink-0 rounded-full bg-foreground text-secondary text-xl flex items-center justify-center font-bold">
+            {user?.name.charAt(0).toUpperCase()}
           </div>
-
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="ml-auto px-1 py-1 text-xs rounded-lg bg-destructive text-white hover:bg-destructive/80 transition"
-          >
-            Logout
-          </button>
+          <div className="flex flex-col gap-[-5px] overflow-hidden">
+            <span className="font-semibold truncate relative">
+              {user?.name}
+            </span>
+            <span className="text-sm font-semibold text-muted-foreground truncate relative">
+              {user?.email}
+            </span>
+          </div>
         </div>
       </div>
     </aside>
