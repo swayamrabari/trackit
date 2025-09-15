@@ -22,6 +22,7 @@ import Navbar from './components/Navbar';
 import MobileNavbar from './components/MobileNavbar';
 import SidebarNav from './components/SidebarNav';
 import { Protected } from './components/Protected';
+import FloatingChatbot from './components/FloatingChatbot';
 
 // Optimized animation variants with snappier custom easing
 const pageVariants = {
@@ -173,6 +174,7 @@ function App() {
       </Routes>
 
       <Toaster />
+      <FloatingChatbot />
     </>
   );
 }
