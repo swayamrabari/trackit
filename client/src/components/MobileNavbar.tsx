@@ -4,7 +4,7 @@ import navOptions from '../constants/navOtions';
 
 function MobileNavbar() {
   return (
-    <nav className="sticky bottom-0 z-30 grid grid-cols-4 gap-10 sm:hidden w-full py-4 pb-5 bg-background border-t border-border px-5 ">
+    <nav className="sticky bottom-0 z-30 grid grid-cols-5 gap-10 sm:hidden w-full py-4 pb-5 bg-background border-t border-border px-5 ">
       {navOptions.map((option) => (
         <NavLink
           key={option.label}
@@ -18,7 +18,7 @@ function MobileNavbar() {
           {React.cloneElement(option.icon, {
             className: 'stroke-[2.2px]',
           })}
-          <span className="text-sm">{option.label}</span>
+          <span className="text-xs">{option.label}</span>
         </NavLink>
       ))}
     </nav>

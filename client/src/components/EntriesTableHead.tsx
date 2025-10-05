@@ -57,7 +57,7 @@ export default function EntriesTableHead({
       <div>
         <div
           className={`title font-bold ${
-            location.pathname === '/' ? 'text-2xl' : 'text-2xl md:text-3xl'
+            location.pathname === '/' ? 'text-2xl' : 'text-3xl'
           }`}
         >
           Entries
@@ -110,7 +110,7 @@ export default function EntriesTableHead({
                   onValueChange={onCategoryChange}
                   disabled={!type}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-secondary">
                     <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
                   <SelectContent>

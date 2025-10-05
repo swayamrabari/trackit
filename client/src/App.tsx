@@ -3,8 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 import { ReactNode } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Toaster } from '@/components/ui/toaster';
-import logo from '../public/trackit.svg';
+import logo from './assets/trackit.svg';
 
 // Auth Pages
 import Login from './pages/Login';
@@ -16,15 +15,15 @@ import Home from './pages/Home';
 import Budget from './pages/Budget';
 import Entries from './pages/Entries';
 import Insights from './pages/Insights';
+import Assistant from './pages/Assistant';
 
 // Components
 import Navbar from './components/Navbar';
 import MobileNavbar from './components/MobileNavbar';
 import SidebarNav from './components/SidebarNav';
 import { Protected } from './components/Protected';
-import Chatbot from './components/Chatbot';
 
-// Optimized animation variants with snappier custom easing
+// Page transition animations
 const pageVariants = {
   initial: { opacity: 0, y: 40 },
   animate: {
@@ -39,15 +38,15 @@ const pageVariants = {
   },
 };
 
-// PageWrapper wraps each route with motion for transitions
+// Wrapper for route pages
 const PageWrapper = ({ children }: { children: ReactNode }) => (
   <motion.div
-    layout // Framer optimizes layout transitions
+    layout
     style={{
       width: '100%',
       willChange: 'opacity, transform',
-      transform: 'translateZ(0)', // Forces GPU layer
-      position: 'relative', // Avoids layout reflows
+      transform: 'translateZ(0)',
+      position: 'relative',
     }}
     variants={pageVariants}
     initial="initial"
@@ -58,90 +57,95 @@ const PageWrapper = ({ children }: { children: ReactNode }) => (
   </motion.div>
 );
 
-// Handles route transitions with AnimatePresence
-function AnimatedRoutes() {
+// Layout for protected pages
+function AppLayout() {
   const location = useLocation();
 
   return (
-    <AnimatePresence
-      mode="wait"
-      initial={false}
-      onExitComplete={() => {
-        // Reset scroll after exit animation
-        const pageContainer = document.querySelector('.page');
-        if (pageContainer) {
-          pageContainer.scrollTo({ top: 0 });
-        }
-      }}
-    >
-      <Routes location={location} key={location.pathname}>
-        <Route
-          path="/"
-          element={
-            <PageWrapper>
-              <Home />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/entries"
-          element={
-            <PageWrapper>
-              <Entries />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/insights"
-          element={
-            <PageWrapper>
-              <Insights />
-            </PageWrapper>
-          }
-        />
-        <Route
-          path="/budget"
-          element={
-            <PageWrapper>
-              <Budget />
-            </PageWrapper>
-          }
-        />
-      </Routes>
-    </AnimatePresence>
-  );
-}
-
-// Layout component for protected pages
-function AppLayout() {
-  return (
     <div className="flex h-screen w-screen overflow-hidden">
-      {/* Sidebar for desktop */}
       <SidebarNav />
 
-      {/* Main content area */}
       <div className="flex flex-col flex-1 w-full min-w-0">
         <Navbar />
-        <div className="page px-3 w-full lg:w-full md:px-12 pb-16 flex-1 overflow-y-auto">
-          <AnimatedRoutes />
+        <div className="page px-3 w-full md:px-12 flex-1 overflow-y-auto">
+          <div className="max-w-[1000px] mx-auto w-full">
+            <AnimatePresence
+              mode="wait"
+              initial={false}
+              onExitComplete={() => {
+                const pageContainer = document.querySelector('.page');
+                if (pageContainer) {
+                  pageContainer.scrollTo({ top: 0 });
+                }
+              }}
+            >
+              <Routes location={location} key={location.pathname}>
+                <Route
+                  path="/"
+                  element={
+                    <PageWrapper>
+                      <Home />
+                    </PageWrapper>
+                  }
+                />
+                <Route
+                  path="/entries"
+                  element={
+                    <PageWrapper>
+                      <Entries />
+                    </PageWrapper>
+                  }
+                />
+                <Route
+                  path="/insights"
+                  element={
+                    <PageWrapper>
+                      <Insights />
+                    </PageWrapper>
+                  }
+                />
+                <Route
+                  path="/budget"
+                  element={
+                    <PageWrapper>
+                      <Budget />
+                    </PageWrapper>
+                  }
+                />
+                <Route
+                  path="/assistant"
+                  element={
+                    <PageWrapper>
+                      <Assistant />
+                    </PageWrapper>
+                  }
+                />
+                {/* Catch-all */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </AnimatePresence>
+          </div>
         </div>
         <MobileNavbar />
-        <Chatbot />
       </div>
     </div>
   );
+}
+
+// PublicRoute: redirect if user already logged in
+function PublicRoute({ children }: { children: JSX.Element }) {
+  const { isAuthenticated } = useAuthStore();
+  return isAuthenticated ? <Navigate to="/" replace /> : children;
 }
 
 // Main App component
 function App() {
   const { checkAuthStatus, isLoading } = useAuthStore();
 
-  // Check authentication status when app loads - only once
   useEffect(() => {
     checkAuthStatus();
   }, [checkAuthStatus]);
 
-  // Show loading screen while checking authentication
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -156,9 +160,30 @@ function App() {
     <>
       <Routes>
         {/* Public routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/verify" element={<Verify />} />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <PublicRoute>
+              <Register />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/verify"
+          element={
+            <PublicRoute>
+              <Verify />
+            </PublicRoute>
+          }
+        />
 
         {/* Protected routes */}
         <Route element={<Protected />}>
@@ -167,14 +192,13 @@ function App() {
             <Route path="/budget" element={<Budget />} />
             <Route path="/entries" element={<Entries />} />
             <Route path="/insights" element={<Insights />} />
+            <Route path="/assistant" element={<Assistant />} />
           </Route>
         </Route>
 
-        {/* Redirect all other routes to login or home */}
+        {/* Catch-all */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-
-      <Toaster />
     </>
   );
 }

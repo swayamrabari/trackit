@@ -92,7 +92,7 @@ function BudgetCard({
           <div
             className={`${
               status.textColor
-            } bg-opacity-10 ${status.color.replace(
+            } bg-opacity-15 ${status.color.replace(
               'bg-',
               'bg-opacity-10 bg-'
             )}`}
@@ -116,7 +116,7 @@ function BudgetCard({
           <span className="text-muted-foreground">
             Remaining: <span>{remaining.toLocaleString('en-IN')}</span>
           </span>
-          <span>{progress}% Used</span>
+          <span>{progress}% Spent</span>
         </div>
       </div>
 
@@ -222,8 +222,8 @@ export default function BudgetPage() {
       <div className="w-full h-full gap-10 items-center justify-center py-5 md:py-10">
         <div className="page-header flex items-center justify-between pb-5">
           <div>
-            <h1 className="title text-2xl md:text-3xl font-bold">Budgets</h1>
-            <p className="text-sm md:text-base text-muted-foreground font-semibold">
+            <h1 className="title text-3xl font-bold">Budgets</h1>
+            <p className="hidden md:block md:text-base text-muted-foreground font-semibold">
               Manage your budgets and track your spending
             </p>
           </div>
@@ -238,7 +238,7 @@ export default function BudgetPage() {
             (type) => (
               <div
                 key={type}
-                className={`flex-1 min-w-[220px] bg-${type}/10 rounded-xl px-6 py-4 border-2 border-${type}/20 flex flex-col items-center shadow-sm`}
+                className={`flex-1 min-w-[220px] bg-${type} bg-opacity-5 rounded-xl px-6 py-4 border-2 border-${type}/20 flex flex-col items-center shadow-sm`}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <span
@@ -270,7 +270,7 @@ export default function BudgetPage() {
                         (summary[type].used / summary[type].total) * 100
                       )
                     : 0}
-                  % Used
+                  % Spent
                 </div>
               </div>
             )
@@ -280,7 +280,7 @@ export default function BudgetPage() {
         <div className="flex flex-col gap-10">
           {budgets.length === 0 ? (
             <div className="text-center text-muted-foreground py-16 text-lg font-medium">
-              No budgets yet. Add one to get started!
+              No budgets yet.
             </div>
           ) : (
             Object.entries(groupedBudgets).map(([type, typeBudgets]) =>

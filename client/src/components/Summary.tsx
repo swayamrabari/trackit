@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useEntriesStore } from '@/store/entriesStore';
-import FilterDialog from '@/components/FilterDialog';
+import TimeFilterDialog from '@/components/TimeFilterDialog';
 
 export default function Summary() {
   const { entries, mainEntries } = useEntriesStore();
@@ -117,13 +117,13 @@ export default function Summary() {
       <div className="summary-card flex flex-col gap-5 md:0 place-items-center">
         <div className="page-header w-full flex items-center justify-between pb-5">
           <div className="head">
-            <h1 className="title text-2xl md:text-3xl font-bold">Summary</h1>
-            <p className="text-sm md:text-base text-muted-foreground font-semibold">
+            <h1 className="title text-3xl font-bold">Summary</h1>
+            <p className="hidden md:block md:text-base text-muted-foreground font-semibold">
               Overview of your financial tracks.
             </p>
           </div>
           <div>
-            <FilterDialog
+            <TimeFilterDialog
               filterType={filterType}
               filterMonth={filterMonth}
               filterYear={filterYear}
@@ -202,7 +202,7 @@ export default function Summary() {
         ].map((item) => (
           <div
             key={item.key}
-            className={`py-2.5 px-4 bg-${item.key}/10 border-2 border-${item.key}/20 rounded-lg`}
+            className={`py-2.5 px-4 bg-${item.key} bg-opacity-10 border-2 border-${item.key}/20 rounded-lg`}
           >
             <div
               className={`text-base mb-1 ${item.textClass} flex items-center justify-between`}

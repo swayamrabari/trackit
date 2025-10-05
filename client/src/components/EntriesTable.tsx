@@ -74,7 +74,15 @@ export default function EntriesTable({ type, category }: EntriesTableProps) {
                 </span>
               </TableCell>
               <TableCell className="capitalize">{entry.category}</TableCell>
-              <TableCell>{entry.date}</TableCell>
+              <TableCell>
+                {new Date(entry.date)
+                  .toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                  })
+                  .replace(/(\w{3}) (\d{2})/, '$1, $2')}
+              </TableCell>
               <TableCell className={`text-right font-bold text-${entry.type}`}>
                 {entry.amount.toLocaleString('en-IN', {
                   minimumFractionDigits: 2,
@@ -114,7 +122,15 @@ export default function EntriesTable({ type, category }: EntriesTableProps) {
               {/* Card Footer */}
               <div className="flex items-center justify-between text-sm capitalize font-semibold">
                 <span>{entry.type}</span>
-                <span>{entry.date}</span>
+                <span>
+                  {new Date(entry.date)
+                    .toLocaleDateString('en-IN', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric',
+                    })
+                    .replace(/(\w{3}) (\d{2})/, '$1, $2')}
+                </span>
               </div>
             </div>
           ))}

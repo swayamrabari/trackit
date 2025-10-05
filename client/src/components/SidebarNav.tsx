@@ -11,6 +11,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { EllipsisVertical, LogOut, Settings } from 'lucide-react';
+import { CategoryDialog } from './dialogs/CategoryDialog';
 
 export default function SidebarNav() {
   const addBudget = useBudgetStore((s) => s.addBudget);
@@ -55,6 +56,7 @@ export default function SidebarNav() {
         <div className="px-2.5 py-1 flex flex-col select-none">
           <AddEntry inSidebar />
           <AddBudgetDialog onAdd={addBudget} inSidebar />
+          <CategoryDialog />
         </div>
       </div>
       {/* Avatar */}
@@ -65,7 +67,7 @@ export default function SidebarNav() {
               <PopoverTrigger className="w-full flex items-center justify-center h-full ml-1.5">
                 <EllipsisVertical />
               </PopoverTrigger>
-              <PopoverContent className="w-40 p-1.5 rounded-lg">
+              <PopoverContent className="w-40 p-1.5 rounded-xl">
                 <div className="flex flex-col gap-1.5">
                   <div
                     className="flex text-expense font-semibold text-sm gap-2 items-center cursor-pointer bg-expense/15 hover:bg-expense/10 transition-all rounded-md p-2"
@@ -76,7 +78,7 @@ export default function SidebarNav() {
                       Logout
                     </span>
                   </div>
-                  <div className="flex text-foreground font-medium text-sm gap-2 items-center cursor-pointer bg-muted hover:bg-muted/80 transition-all rounded-md p-2">
+                  <div className="flex text-foreground font-medium text-sm gap-2 items-center cursor-pointer bg-muted hover:bg-muted/80 transition-colors rounded-md p-2">
                     <Settings className="inline h-5 w-5" />
                     <span>Settings</span>
                   </div>

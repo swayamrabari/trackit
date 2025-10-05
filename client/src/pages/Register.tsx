@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react';
-import logo from '../../public/trackit.svg';
+import logo from '../assets/trackit.svg';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
 import { Button } from '@/components/ui/button';
@@ -32,7 +32,9 @@ export default function Register() {
       });
       navigate('/verify', { state: { email } });
     } catch (err: any) {
-      toast.error(err.message || 'Something went wrong', { id: 'register' });
+      toast.error(err.response?.data?.message || 'Something went wrong', {
+        id: 'register',
+      });
     }
   };
 
