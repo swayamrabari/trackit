@@ -2,11 +2,24 @@ import { useState } from 'react';
 import { useEntriesStore } from '@/store/entriesStore';
 import TimeFilterDialog from '@/components/TimeFilterDialog';
 
-export default function Summary() {
+interface SummaryProps {
+  onFilterChange?: (
+    type: string,
+    month: number | null,
+    year: number | null,
+    start: Date | undefined,
+    end: Date | undefined
+  ) => void;
+}
+
+export default function Summary({ onFilterChange }: SummaryProps = {}) {
   const { entries, mainEntries } = useEntriesStore();
-  const [filterType, setFilterType] = useState('all');
-  const [filterMonth, setFilterMonth] = useState<number | null>(null);
-  const [filterYear, setFilterYear] = useState<number | null>(null);
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1; // 1-12
+  const currentYear = currentDate.getFullYear();
+  const [filterType, setFilterType] = useState('month');
+  const [filterMonth, setFilterMonth] = useState<number | null>(currentMonth);
+  const [filterYear, setFilterYear] = useState<number | null>(currentYear);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
@@ -110,10 +123,11 @@ export default function Summary() {
     setFilterYear(year);
     setStartDate(start);
     setEndDate(end);
+    onFilterChange?.(type, month, year, start, end);
   };
 
   return (
-    <div className="h-auto w-full flex flex-col mt-5 sm:mt-10 gap-5 mb-5">
+    <div className="h-auto w-full flex flex-col">
       <div className="summary-card flex flex-col gap-5 md:0 place-items-center">
         <div className="page-header w-full flex items-center justify-between pb-5">
           <div className="head">
@@ -140,7 +154,7 @@ export default function Summary() {
               Net Total
             </div>
             <div className="amount flex items-baseline gap-1">
-              <div className="text-2xl font-bold tracking-wider">
+              <div className="text-2xl font-bold tracking-wide">
                 {(
                   filteredData.income -
                   filteredData.expense +

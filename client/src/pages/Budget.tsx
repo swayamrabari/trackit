@@ -16,8 +16,13 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { EditBudgetDialog } from '@/components/budget/EditBudgetDialog';
-import { useEntriesStore } from '@/store/entriesStore';
 import AddBudgetDialog from '@/components/budget/AddBudgetDialog';
+import BudgetTimePeriodFilterDialog, {
+  BudgetPeriod,
+} from '@/components/budget/BudgetTimePeriodFilterDialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
 
 function BudgetCard({
   budget,
@@ -82,7 +87,7 @@ function BudgetCard({
 
   return (
     <div className="flex bg-accent/30 items-center gap-6 rounded-xl px-5 py-4 border-2 border-border shadow-md transition-all hover:shadow-lg relative">
-      <div className="flex-1 flex flex-col gap-2">
+      <div className="flex-1 flex flex-col gap-2.5">
         <div className="flex items-center gap-3">
           <span className="font-semibold text-xl md:text-xl capitalize">
             {budget.category}
@@ -90,12 +95,11 @@ function BudgetCard({
         </div>
         <div className="flex items-center gap-2 *:rounded-md *:px-2.5 *:py-1 *:text-xs *:font-semibold">
           <div
-            className={`${
-              status.textColor
-            } bg-opacity-15 ${status.color.replace(
-              'bg-',
-              'bg-opacity-10 bg-'
-            )}`}
+            className={`${status.textColor
+              } bg-opacity-15 ${status.color.replace(
+                'bg-',
+                'bg-opacity-10 bg-'
+              )}`}
           >
             {status.label}
           </div>
@@ -104,7 +108,7 @@ function BudgetCard({
           </div>
         </div>
         <div className="flex items-baseline gap-2 mt-1">
-          <span className="text-2xl font-bold text-primary">
+          <span className="text-xl font-semibold text-primary">
             {currentSpending.toLocaleString('en-IN')}
           </span>
           <span className="text-base text-muted-foreground font-semibold">
@@ -176,46 +180,69 @@ export default function BudgetPage() {
   const removeBudget = useBudgetStore((s) => s.removeBudget);
   const updateBudget = useBudgetStore((s) => s.updateBudget);
 
-  // Subscribe to entries to trigger re-render when entries change
-  const entries = useEntriesStore((s) => s.entries);
-
   const [editBudget, setEditBudget] = useState<Budget | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState<Budget['type']>('expense');
+  const [selectedPeriod, setSelectedPeriod] = useState<BudgetPeriod>('all');
+
+  // Helper function to get type-specific classes
+  const getTypeClasses = (type: Budget['type']) => {
+    const classMap = {
+      expense: {
+        text: 'text-expense',
+        bg: 'bg-expense',
+        border: 'border-expense',
+        bgOpacity: 'bg-expense/10',
+        borderOpacity: 'border-expense/20',
+        bgCard: 'bg-expense/5',
+        borderCard: 'border-expense/20',
+      },
+      savings: {
+        text: 'text-savings',
+        bg: 'bg-savings',
+        border: 'border-savings',
+        bgOpacity: 'bg-savings/10',
+        borderOpacity: 'border-savings/20',
+        bgCard: 'bg-savings/5',
+        borderCard: 'border-savings/20',
+      },
+      investment: {
+        text: 'text-investment',
+        bg: 'bg-investment',
+        border: 'border-investment',
+        bgOpacity: 'bg-investment/10',
+        borderOpacity: 'border-investment/20',
+        bgCard: 'bg-investment/5',
+        borderCard: 'border-investment/20',
+      },
+    };
+    return classMap[type];
+  };
 
   const handleEditBudget = (budget: Budget) => {
     setEditBudget(budget);
     setEditDialogOpen(true);
   };
 
-  // Group budgets by type for summary
-  const summary = useMemo(() => {
-    const result: Record<Budget['type'], { total: number; used: number }> = {
-      expense: { total: 0, used: 0 },
-      savings: { total: 0, used: 0 },
-      investment: { total: 0, used: 0 },
-    };
-    budgets.forEach((budget) => {
-      const { currentSpending } = calculateBudgetProgress(budget);
-      result[budget.type].total += budget.amount;
-      result[budget.type].used += currentSpending;
+  // Map budget period to filter period
+  const mapBudgetPeriodToFilterPeriod = (period: string): BudgetPeriod => {
+    if (period === 'monthly') return 'monthly';
+    if (period === 'quarterly') return 'quarterly';
+    if (period === 'half-yearly') return 'half-yearly';
+    if (period === 'yearly') return 'yearly';
+    return 'all';
+  };
+
+  // Filter budgets by selected type and period
+  const filteredBudgets = useMemo(() => {
+    return budgets.filter((budget) => {
+      const typeMatch = budget.type === selectedType;
+      const periodMatch =
+        selectedPeriod === 'all' ||
+        mapBudgetPeriodToFilterPeriod(budget.period) === selectedPeriod;
+      return typeMatch && periodMatch;
     });
-    return result;
-  }, [budgets, entries]); // Add entries as a dependency here
-
-  // Group budgets by type
-  const groupedBudgets = useMemo(() => {
-    const groups: Record<Budget['type'], Budget[]> = {
-      expense: [],
-      savings: [],
-      investment: [],
-    };
-
-    budgets.forEach((budget) => {
-      groups[budget.type].push(budget);
-    });
-
-    return groups;
-  }, [budgets]);
+  }, [budgets, selectedType, selectedPeriod]);
 
   return (
     <div className="w-full flex flex-col items-center">
@@ -227,83 +254,68 @@ export default function BudgetPage() {
               Manage your budgets and track your spending
             </p>
           </div>
-          <div>
+          <div className="flex items-center gap-3">
+            <BudgetTimePeriodFilterDialog
+              selectedPeriod={selectedPeriod}
+              onPeriodChange={setSelectedPeriod}
+            />
             <AddBudgetDialog onAdd={addBudget} />
           </div>
         </div>
 
-        {/* Summary section */}
-        <div className="flex flex-col md:flex-row gap-6 mb-10">
-          {(['expense', 'savings', 'investment'] as Budget['type'][]).map(
-            (type) => (
-              <div
-                key={type}
-                className={`flex-1 min-w-[220px] bg-${type} bg-opacity-5 rounded-xl px-6 py-4 border-2 border-${type}/20 flex flex-col items-center shadow-sm`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <span
-                    className={`font-bold tracking-wide capitalize text-lg text-${type}`}
+        {/* Tabbed interface for transaction types */}
+        <div className="w-full mb-8">
+          <RadioGroup
+            onValueChange={(value) => setSelectedType(value as Budget['type'])}
+            className="grid grid-cols-3 gap-4 font-semibold"
+            value={selectedType}
+          >
+            {(['expense', 'savings', 'investment'] as Budget['type'][]).map(
+              (type) => {
+                const typeClasses = getTypeClasses(type);
+                return (
+                  <Label
+                    key={type}
+                    htmlFor={type}
+                    className={cn(
+                      'flex font-bold items-center justify-center rounded-md border-2 py-2 text-base cursor-pointer',
+                      typeClasses.text,
+                      selectedType === type &&
+                      `${typeClasses.bgOpacity} ${typeClasses.borderOpacity} transition-all duration-75`
+                    )}
                   >
-                    {type}
-                  </span>
-                </div>
-                <div className="text-2xl font-extrabold">
-                  {summary[type].used.toLocaleString('en-IN')}
-                  <span className="text-base text-muted-foreground font-semibold">
-                    {' '}
-                    / {summary[type].total.toLocaleString('en-IN')}
-                  </span>
-                </div>
-                <Progress
-                  value={
-                    summary[type].total
-                      ? Math.round(
-                          (summary[type].used / summary[type].total) * 100
-                        )
-                      : 0
-                  }
-                  className="h-2 mt-3"
-                />
-                <div className="text-xs text-foreground/70 mt-3">
-                  {summary[type].total
-                    ? Math.round(
-                        (summary[type].used / summary[type].total) * 100
-                      )
-                    : 0}
-                  % Spent
-                </div>
-              </div>
-            )
-          )}
+                    <RadioGroupItem
+                      value={type}
+                      id={type}
+                      className="sr-only"
+                    />
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </Label>
+                );
+              }
+            )}
+          </RadioGroup>
         </div>
 
+        {/* Budgets list for selected type */}
         <div className="flex flex-col gap-10">
-          {budgets.length === 0 ? (
+          {filteredBudgets.length === 0 ? (
             <div className="text-center text-muted-foreground py-16 text-lg font-medium">
-              No budgets yet.
+              No {selectedType} budgets yet.
             </div>
           ) : (
-            Object.entries(groupedBudgets).map(([type, typeBudgets]) =>
-              typeBudgets.length > 0 ? (
-                <div key={type} className="budget-group">
-                  <div className="mb-3">
-                    <h2 className="text-xl bg- font-bold capitalize">
-                      {type} Budgets
-                    </h2>
-                  </div>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {typeBudgets.map((budget) => (
-                      <BudgetCard
-                        key={budget.id}
-                        budget={budget}
-                        onRemove={removeBudget}
-                        onEdit={handleEditBudget}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ) : null
-            )
+            <div className="budget-group">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {filteredBudgets.map((budget) => (
+                  <BudgetCard
+                    key={budget.id}
+                    budget={budget}
+                    onRemove={removeBudget}
+                    onEdit={handleEditBudget}
+                  />
+                ))}
+              </div>
+            </div>
           )}
         </div>
       </div>

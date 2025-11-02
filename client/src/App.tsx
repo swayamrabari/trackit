@@ -9,6 +9,9 @@ import logo from './assets/trackit.svg';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Verify from './pages/Verify';
+import ForgotPassword from './pages/ForgotPassword';
+import VerifyForgotPassword from './pages/VerifyForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // Main Pages
 import Home from './pages/Home';
@@ -29,12 +32,12 @@ const pageVariants = {
   animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] },
+    transition: { duration: 0.2, ease: [0.2, 0, 0.4, 1] },
   },
   exit: {
     opacity: 0,
     y: 40,
-    transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] },
+    transition: { duration: 0.2, ease: [0.2, 0, 0.4, 1] },
   },
 };
 
@@ -181,6 +184,30 @@ function App() {
           element={
             <PublicRoute>
               <Verify />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <PublicRoute>
+              <ForgotPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/verify-forgot-password"
+          element={
+            <PublicRoute>
+              <VerifyForgotPassword />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <PublicRoute>
+              <ResetPassword />
             </PublicRoute>
           }
         />

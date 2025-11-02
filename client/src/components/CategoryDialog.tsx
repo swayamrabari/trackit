@@ -10,26 +10,55 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-// import { useCategoriesStore } from '@/store/categoriesStore';
+import AddCategoryIcon from '../assets/addcategory.svg';
 import { useState } from 'react';
-import { FolderPlus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCategoriesStore } from '@/store/categoriesStore';
+import { toast } from 'sonner';
 
 export function CategoryDialog() {
+  const [open, setOpen] = useState(false);
   const [type, setType] = useState('');
   const [categoryName, setCategoryName] = useState('');
+  const [error, setError] = useState('');
 
+  const { addCategory } = useCategoriesStore();
   const entryTypes = ['income', 'expense', 'investment', 'savings'];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation
+    if (!type) {
+      setError('Please select a category type');
+      return;
+    }
+    if (!categoryName.trim()) {
+      setError('Please enter a category name');
+      return;
+    }
+
+    // Add category to store
+    addCategory(type as 'income' | 'expense' | 'investment' | 'savings', categoryName.toLowerCase().trim());
+
+    // Reset form and close dialog
+    setType('');
+    setCategoryName('');
+    setError('');
+    setOpen(false);
   };
 
   return (
-    <Dialog>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        setError('');
+      }}
+    >
       <DialogTrigger asChild>
         <div className="transition-all font-medium w-full flex gap-2 hover:bg-secondary cursor-pointer items-center justify-start px-2.5 py-2 rounded-md">
-          <FolderPlus className="h-[20px] w-[25px]" />
+          <img src={AddCategoryIcon} alt="" className="h-[20px] w-[25px]" />
           <span className="text-base">Add Category</span>
         </div>
       </DialogTrigger>
@@ -57,7 +86,7 @@ export function CategoryDialog() {
                 className={cn(
                   `flex font-bold items-center justify-center rounded-md border-[1.5px] h-10 text-${etype}`,
                   type === etype &&
-                    `bg-${etype}/10 border-${etype} transition-all duration-75`
+                  `bg-${etype}/10 border-${etype} transition-all duration-75`
                 )}
               >
                 <RadioGroupItem value={etype} id={etype} className="sr-only" />
@@ -72,7 +101,14 @@ export function CategoryDialog() {
             onChange={(e) => setCategoryName(e.target.value)}
             placeholder="Category Name"
           />
-          <Button type="submit" className="w-full">
+          {error && (
+            <div className="text-sm text-red-500 font-medium">{error}</div>
+          )}
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={!type || !categoryName.trim()}
+          >
             Add Category
           </Button>
         </form>

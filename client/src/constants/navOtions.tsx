@@ -15,7 +15,7 @@ const navOptions = [
   },
   { path: '/insights', icon: <ChartPie />, label: 'Insights' },
   { path: '/budget', icon: <WalletCards />, label: 'Budgets' },
-  { path: '/assistant', icon: <Sparkles />, label: 'Assistant' },
+  { path: '/assistant', icon: <Sparkles />, label: 'TrackIt AI' },
 ];
 
 export default navOptions;

@@ -12,9 +12,12 @@ export default function Insights() {
   const [selectedChart, setSelectedChart] = useState('Income');
 
   // Time filter state
-  const [filterType, setFilterType] = useState('all');
-  const [filterMonth, setFilterMonth] = useState<number | null>(null);
-  const [filterYear, setFilterYear] = useState<number | null>(null);
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1; // 1-12
+  const currentYear = currentDate.getFullYear();
+  const [filterType, setFilterType] = useState('month');
+  const [filterMonth, setFilterMonth] = useState<number | null>(currentMonth);
+  const [filterYear, setFilterYear] = useState<number | null>(currentYear);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 

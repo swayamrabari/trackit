@@ -167,7 +167,7 @@ export default function TimeFilterDialog({
       <DialogContent className="w-full max-h-[90vh] sm:w-[400px] overflow-auto no-scrollbar">
         <DialogHeader>
           <DialogTitle className="text-xl">Time Range</DialogTitle>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm font-semibold text-muted-foreground mt-1">
             Select a time period to view your financial data
           </p>
         </DialogHeader>
@@ -190,7 +190,7 @@ export default function TimeFilterDialog({
               </Button>
               <Button
                 variant={localFilterType === 'month' ? 'default' : 'outline'}
-                size="sm"
+                size="sm" 
                 onClick={() => handleFilterTypeChange('month')}
                 className="w-full border-[1.5px]"
               >
@@ -493,3 +493,4 @@ export default function TimeFilterDialog({
     </Dialog>
   );
 }
+

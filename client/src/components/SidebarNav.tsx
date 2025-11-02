@@ -10,8 +10,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { EllipsisVertical, LogOut, Settings } from 'lucide-react';
-import { CategoryDialog } from './dialogs/CategoryDialog';
+import { EllipsisVertical, LogOut } from 'lucide-react';
+import { CategoryDialog } from './CategoryDialog';
 
 export default function SidebarNav() {
   const addBudget = useBudgetStore((s) => s.addBudget);
@@ -61,7 +61,7 @@ export default function SidebarNav() {
       </div>
       {/* Avatar */}
       <div className="mt-auto profile-card p-3">
-        <div className="relative overflow-hidden group flex items-center gap-3 p-3 bg-secondary rounded-md">
+        <div className="relative overflow-hidden group flex items-center gap-3 p-3 bg-secondary rounded-lg">
           <div className="absolute z-50 bg-gradient-to-l from-secondary from-70% to-transparent h-full w-14 right-0 opacity-0 group-hover:opacity-100 transition-opacity">
             <Popover>
               <PopoverTrigger className="w-full flex items-center justify-center h-full ml-1.5">
@@ -77,10 +77,6 @@ export default function SidebarNav() {
                     <span onClick={() => useAuthStore.getState().logout()}>
                       Logout
                     </span>
-                  </div>
-                  <div className="flex text-foreground font-medium text-sm gap-2 items-center cursor-pointer bg-muted hover:bg-muted/80 transition-colors rounded-md p-2">
-                    <Settings className="inline h-5 w-5" />
-                    <span>Settings</span>
                   </div>
                 </div>
               </PopoverContent>

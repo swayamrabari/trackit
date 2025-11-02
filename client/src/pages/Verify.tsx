@@ -25,15 +25,17 @@ export default function Verify() {
     e.preventDefault();
     clearError();
 
+    toast.loading('Verifying...', { id: 'verify' });
+
     if (!email) {
-      toast.error('Email not found. Please register again.');
+      toast.error('No email found, please register again.', { id: 'verify' });
       navigate('/register');
       return;
     }
 
     try {
       await verifyOtp(email, otp);
-      toast.success('Verification Successful. Please login.');
+      toast.success('Email verified successfully!', { id: 'verify' });
       navigate('/login');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Verification Failed');

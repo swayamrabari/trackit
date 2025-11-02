@@ -18,6 +18,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { cn } from '@/lib/utils';
 
 const periodOptions = [
   { value: 'monthly', label: 'Monthly' },
@@ -74,7 +76,7 @@ export function EditBudgetDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-h-full sm:w-[400px] overflow-auto">
+      <DialogContent className="w-full max-h-full sm:w-[520px] overflow-auto">
         <DialogHeader className="mb-2">
           <DialogTitle>Edit Budget</DialogTitle>
           <DialogDescription>
@@ -93,27 +95,36 @@ export function EditBudgetDialog({
           />
           <div className="flex flex-col gap-2">
             <Label className="mt-1 font-semibold">Select Budget Type</Label>
-            <Select
+            <RadioGroup
               value={type}
               onValueChange={(value) => {
                 setType(value as Budget['type']);
                 setCategory('');
               }}
+              className="flex flex-col sm:flex-row gap-2 font-semibold"
             >
-              <SelectTrigger className="bg-secondary border-none capitalize">
-                <SelectValue
-                  placeholder="Budget Type"
-                  className="w-full text-left"
-                />
-              </SelectTrigger>
-              <SelectContent>
-                {typeOptions.map((opt) => (
-                  <SelectItem key={opt.value} value={opt.value}>
+              {typeOptions.map((opt) => {
+                const uniqueId = `edit-dialog-budget-type-${opt.value}`;
+                return (
+                  <Label
+                    key={opt.value}
+                    htmlFor={uniqueId}
+                    className={cn(
+                      `flex flex-1 font-bold items-center justify-center rounded-md border-[1.5px] h-10 text-${opt.value}`,
+                      type === opt.value &&
+                        `bg-${opt.value}/10 border-${opt.value} transition-all duration-75`
+                    )}
+                  >
+                    <RadioGroupItem
+                      value={opt.value}
+                      id={uniqueId}
+                      className="sr-only"
+                    />
                     {opt.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+                  </Label>
+                );
+              })}
+            </RadioGroup>
           </div>
           <Label className="mt-3 font-semibold">Select Category</Label>
           <Select value={category} onValueChange={setCategory} disabled={!type}>

@@ -85,6 +85,11 @@ export default function Login() {
             {isLoading ? 'Logging in...' : 'Login'}
           </Button>
         </form>
+        <p className="mt-3 font-semibold text-center text-sm">
+          <Link to="/forgot-password" className="text-primary underline hover:text-primary/80">
+            Forgot Password?
+          </Link>
+        </p>
         <p className="mt-4 font-semibold text-center text-sm text-muted-foreground">
           Don't have an account?{' '}
           <Link to="/register" className="text-primary underline">

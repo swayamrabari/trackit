@@ -14,7 +14,7 @@ const entrySchema = new mongoose.Schema(
     },
     amount: { type: Number, required: true },
     category: { type: String, required: true },
-    date: { type: Date, default: Date.now },
+    date: { type: Date, default: Date.now, required: true },
     description: { type: String },
   },
   { timestamps: true }

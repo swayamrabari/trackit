@@ -22,6 +22,8 @@ import { Budget } from '@/store/budgetStore';
 import { Label } from '@/components/ui/label';
 import { Plus } from 'lucide-react';
 import { SelectGroup } from '@radix-ui/react-select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { cn } from '@/lib/utils';
 
 type AddBudgetDialogProps = {
   onAdd: (budget: Omit<Budget, 'id'>) => void;
@@ -61,6 +63,7 @@ export default function AddBudgetDialog({
       category,
       amount: Number(amount),
       period,
+      spent: 0,
     });
     setOpen(false);
     setCategory('');
@@ -97,7 +100,7 @@ export default function AddBudgetDialog({
           </Button>
         </DialogTrigger>
       )}
-      <DialogContent className="w-full max-h-full sm:w-[400px] overflow-auto">
+      <DialogContent className="w-full max-h-full sm:w-[520px] overflow-auto">
         <DialogHeader className="mb-2">
           <DialogTitle>Add Budget</DialogTitle>
           <DialogDescription>
@@ -115,26 +118,32 @@ export default function AddBudgetDialog({
             required
           />
           <Label className="mt-3 font-semibold">Select Budget Type</Label>
-          <Select
+          <RadioGroup
             value={type}
             onValueChange={(v) => {
               setType(v as Budget['type']);
               setCategory('');
             }}
+            className="flex flex-col sm:flex-row gap-2 font-semibold"
           >
-            <SelectTrigger className="bg-secondary border-none capitalize">
-              <SelectValue placeholder="Type" className="w-full text-left" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {typeOptions.map((type) => (
-                  <SelectItem key={type} value={type} className="capitalize">
-                    {type.charAt(0).toUpperCase() + type.slice(1)}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+            {typeOptions.map((btype) => {
+              const uniqueId = `dialog-budget-type-${btype}`;
+              return (
+                <Label
+                  key={btype}
+                  htmlFor={uniqueId}
+                  className={cn(
+                    `flex flex-1 font-bold items-center justify-center rounded-md border-[1.5px] min-h-10 text-${btype}`,
+                    type === btype &&
+                    `bg-${btype}/10 border-${btype} transition-all duration-75`
+                  )}
+                >
+                  <RadioGroupItem value={btype} id={uniqueId} className="sr-only" />
+                  {btype.charAt(0).toUpperCase() + btype.slice(1)}
+                </Label>
+              );
+            })}
+          </RadioGroup>
           <Label className="mt-3 font-semibold">Select Category</Label>
           <Select value={category} onValueChange={setCategory} disabled={!type}>
             <SelectTrigger className="bg-secondary border-none capitalize">
@@ -172,7 +181,11 @@ export default function AddBudgetDialog({
           {error && (
             <div className="text-sm text-red-500 font-medium">{error}</div>
           )}
-          <Button type="submit" className="font-semibold mt-3 w-full">
+          <Button 
+            type="submit" 
+            className="font-semibold mt-3 w-full"
+            disabled={!type || !category || !amount || !period || Number(amount) <= 0}
+          >
             Add
           </Button>
         </form>
