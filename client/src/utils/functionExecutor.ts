@@ -641,13 +641,13 @@ export async function executeFunction(
       case 'compareActualVsBudget': {
         const params = parameters as CompareActualVsBudget;
         let budgets = useBudgetStore.getState().getBudgetsByType(params.type);
-        
+
         if (params.category) {
-          budgets = budgets.filter(b => b.category.toLowerCase() === params.category.toLowerCase());
+          budgets = budgets.filter(b => b.category.toLowerCase() === (params.category as string).toLowerCase());
         }
 
         if (budgets.length === 0) {
-          result = { 
+          result = {
             message: `No budgets found for ${params.category ? `category "${params.category}"` : params.type}`,
             budgets: []
           };
@@ -678,7 +678,7 @@ export async function executeFunction(
         // Single budget case - use progress calculation for accurate period-based comparison
         const budget = budgets[0];
         const progress = calculateBudgetProgress(budget);
-        
+
         result = {
           category: budget.category,
           period: budget.period,
@@ -792,7 +792,7 @@ export async function executeFunction(
           budgets = budgets.filter(b => b.type === params.type);
         }
         if (params.category) {
-          budgets = budgets.filter(b => b.category.toLowerCase() === params.category.toLowerCase());
+          budgets = budgets.filter(b => b.category.toLowerCase() === (params.category as string).toLowerCase());
         }
 
         result = budgets.map(budget => {
@@ -817,7 +817,7 @@ export async function executeFunction(
         let budgets = useBudgetStore.getState().getBudgetsByType(params.type!);
 
         if (params.category) {
-          budgets = budgets.filter(b => b.category.toLowerCase() === params.category.toLowerCase());
+          budgets = budgets.filter(b => b.category.toLowerCase() === (params.category as string).toLowerCase());
         }
 
         if (budgets.length === 0) {
@@ -845,18 +845,18 @@ export async function executeFunction(
         let budgets = useBudgetStore.getState().getBudgetsByType(params.type!);
 
         if (params.category) {
-          budgets = budgets.filter(b => b.category.toLowerCase() === params.category.toLowerCase());
+          budgets = budgets.filter(b => b.category.toLowerCase() === (params.category as string).toLowerCase());
         }
 
         const currentDate = new Date();
-        
+
         result = budgets.map(budget => {
           const progress = calculateBudgetProgress(budget);
-          
+
           // Calculate days remaining in period
           let periodEnd: Date;
           const periodStart = new Date(currentDate);
-          
+
           if (budget.period === 'monthly') {
             periodStart.setDate(1);
             periodEnd = new Date(periodStart);
@@ -880,9 +880,9 @@ export async function executeFunction(
           } else {
             periodEnd = new Date();
           }
-          
+
           const daysRemaining = Math.max(0, Math.ceil((periodEnd.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24)));
-          
+
           return {
             category: budget.category,
             period: budget.period,
@@ -1001,7 +1001,7 @@ export async function executeFunction(
 
         try {
           await useEntriesStore.getState().addEntry(newEntry);
-          
+
           result = {
             success: true,
             message: `Successfully added ${params.type} entry of ${params.amount} for ${params.category} on ${params.date}`,
@@ -1073,16 +1073,16 @@ export async function executeFunction(
         try {
           console.log('[setBudget] Attempting to create budget:', newBudget);
           await useBudgetStore.getState().addBudget(newBudget);
-          
+
           // Verify budget was actually added by checking the store
           const budgets = useBudgetStore.getState().getBudgets();
-          const createdBudget = budgets.find(b => 
-            b.type === params.type && 
-            b.category === params.category && 
+          const createdBudget = budgets.find(b =>
+            b.type === params.type &&
+            b.category === params.category &&
             b.period === params.period &&
             b.amount === params.amount
           );
-          
+
           if (!createdBudget) {
             console.warn('[setBudget] Budget not found in store after creation');
             result = {

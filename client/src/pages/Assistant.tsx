@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { ArrowUp, History, MessageSquarePlus, Plus } from 'lucide-react';
+import { ArrowUp, History, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useAuthStore } from '@/store/authStore';
 import { useChatStore } from '@/store/chatStore';
@@ -575,8 +575,8 @@ export default function Assistant() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.25 }}
                     className={`max-w-[85%] md:max-w-[70%] rounded-xl text-sm font-medium md:text-base px-3 py-[7px] leading-6 ${isUser
-                        ? 'bg-secondary text-secondary-foreground'
-                        : '!px-0 py-0.5'
+                      ? 'bg-secondary text-secondary-foreground'
+                      : '!px-0 py-0.5'
                       }`}
                   >
                     {m.content ? (
