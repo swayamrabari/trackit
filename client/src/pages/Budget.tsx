@@ -187,7 +187,15 @@ export default function BudgetPage() {
 
   // Helper function to get type-specific classes
   const getTypeClasses = (type: Budget['type']) => {
-    const classMap = {
+    const classMap: Record<Budget['type'], {
+      text: string;
+      bg: string;
+      border: string;
+      bgOpacity: string;
+      borderOpacity: string;
+      bgCard: string;
+      borderCard: string;
+    }> = {
       expense: {
         text: 'text-expense',
         bg: 'bg-expense',

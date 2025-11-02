@@ -70,8 +70,6 @@ export default function EntriesTableHead({
 
   const categories = useCategoriesStore((state) => state.categories);
   const entryTypes = Object.keys(categories);
-  const relevantCategories =
-    (categories[type as keyof typeof categories] as string[]) || [];
 
   const resetFilters = () => {
     // Reset both local state and applied filters

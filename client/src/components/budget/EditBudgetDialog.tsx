@@ -48,7 +48,7 @@ export function EditBudgetDialog({
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [period, setPeriod] = useState<Budget['period']>('monthly');
-  const categories = useCategoriesStore((s) => s.categories[type]);
+  const categories = useCategoriesStore((s) => s.categories[type as keyof typeof s.categories] || []);
 
   // Initialize form when budget changes
   useEffect(() => {
@@ -135,7 +135,7 @@ export function EditBudgetDialog({
               />
             </SelectTrigger>
             <SelectContent>
-              {categories.map((cat) => (
+              {(categories || []).map((cat: string) => (
                 <SelectItem key={cat} value={cat} className="capitalize">
                   {cat.charAt(0).toUpperCase() + cat.slice(1)}
                 </SelectItem>

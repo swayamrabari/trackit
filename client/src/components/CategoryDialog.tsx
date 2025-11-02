@@ -14,7 +14,6 @@ import AddCategoryIcon from '../assets/addcategory.svg';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useCategoriesStore } from '@/store/categoriesStore';
-import { toast } from 'sonner';
 
 export function CategoryDialog() {
   const [open, setOpen] = useState(false);

@@ -124,7 +124,6 @@ export const useCategoriesStore = create<CategoriesStore>()(
       },
 
       removeCategory: async (categoryType: keyof Categories, category: string) => {
-        const state = get();
         
         // Check if it's a default category (don't remove defaults, only user-added ones)
         if (defaultCategories[categoryType].includes(category)) {
