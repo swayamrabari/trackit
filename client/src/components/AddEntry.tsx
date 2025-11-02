@@ -18,6 +18,7 @@ import {
 } from './ui/dialog';
 import { Button } from './ui/button';
 import { CalendarIcon, Plus } from 'lucide-react';
+import AddEntryIcon from '../assets/addentey.svg';
 import { useCategoriesStore } from '@/store/categoriesStore';
 import { Input } from './ui/input';
 import { format } from 'date-fns';
@@ -32,7 +33,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 
-export default function AddEntry() {
+export default function AddEntry({ inSidebar = false }) {
   const [date, setDate] = useState<Date>();
   const [type, setType] = useState('');
   const [category, setCategory] = useState('');
@@ -52,12 +53,25 @@ export default function AddEntry() {
   return (
     <>
       <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="secondary" className="w-10 sm:w-fit font-semibold">
-            <Plus className="stroke-[2.5px]" />
-            <span className="hidden sm:block">Add</span>
-          </Button>
-        </DialogTrigger>
+        {inSidebar ? (
+          <DialogTrigger asChild>
+            <div className="transition-all font-medium w-full flex gap-2 hover:bg-secondary cursor-pointer items-center justify-start px-2.5 py-2 rounded-md">
+              <img
+                src={AddEntryIcon}
+                alt="Add Entry"
+                className="h-[20px] w-[25px]"
+              />
+              <span className="text-base">Add Entry</span>
+            </div>
+          </DialogTrigger>
+        ) : (
+          <DialogTrigger asChild>
+            <Button variant="secondary" className="w-10 sm:w-fit font-semibold">
+              <Plus className="stroke-[2.5px]" />
+              <span className="hidden sm:block">Add</span>
+            </Button>
+          </DialogTrigger>
+        )}
         <DialogContent className="w-full max-h-full sm:w-[400px] overflow-auto">
           <DialogHeader className="mb-2">
             <DialogTitle>Add Entry</DialogTitle>
@@ -87,7 +101,7 @@ export default function AddEntry() {
                 className={cn(
                   `flex font-bold items-center justify-center rounded-md border-[1.5px] h-10 text-${etype}`,
                   type === etype &&
-                    `bg-${etype}/15 border-${etype} transition-all duration-75`
+                    `bg-${etype}/10 border-${etype} transition-all duration-75`
                 )}
               >
                 <RadioGroupItem value={etype} id={etype} className="sr-only" />

@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/popover';
 import { format } from 'date-fns';
 
-type FilterDialogProps = {
+type TimeFilterDialogProps = {
   filterType: string;
   filterMonth: number | null;
   filterYear: number | null;
@@ -42,7 +42,7 @@ type FilterDialogProps = {
   displayText: string;
 };
 
-export default function FilterDialog({
+export default function TimeFilterDialog({
   filterType,
   filterMonth,
   filterYear,
@@ -50,7 +50,7 @@ export default function FilterDialog({
   endDate,
   onFilterChange,
   displayText,
-}: FilterDialogProps) {
+}: TimeFilterDialogProps) {
   // Local state for the dialog
   const [localFilterType, setLocalFilterType] = useState(filterType);
   const [localFilterMonth, setLocalFilterMonth] = useState(filterMonth);
@@ -98,13 +98,24 @@ export default function FilterDialog({
     return false;
   };
 
-  // Reset filter values when changing filter type
   const handleFilterTypeChange = (type: string) => {
     setLocalFilterType(type);
-    setLocalFilterMonth(null);
-    setLocalFilterYear(null);
-    setLocalStartDate(undefined);
-    setLocalEndDate(undefined);
+
+    if (type === 'month') {
+      setLocalFilterMonth(currentMonth);
+      setLocalFilterYear(currentYear);
+    } else if (type === 'quarter') {
+      const currentQuarter = Math.floor((currentMonth - 1) / 3) + 1;
+      setLocalFilterMonth(currentQuarter);
+      setLocalFilterYear(currentYear);
+    } else if (type === 'year') {
+      setLocalFilterYear(currentYear);
+    } else {
+      setLocalFilterMonth(null);
+      setLocalFilterYear(null);
+      setLocalStartDate(undefined);
+      setLocalEndDate(undefined);
+    }
   };
 
   // Check if the filter is complete and can be applied
@@ -156,7 +167,7 @@ export default function FilterDialog({
       <DialogContent className="w-full max-h-[90vh] sm:w-[400px] overflow-auto no-scrollbar">
         <DialogHeader>
           <DialogTitle className="text-xl">Time Range</DialogTitle>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-sm font-semibold text-muted-foreground mt-1">
             Select a time period to view your financial data
           </p>
         </DialogHeader>
@@ -179,7 +190,7 @@ export default function FilterDialog({
               </Button>
               <Button
                 variant={localFilterType === 'month' ? 'default' : 'outline'}
-                size="sm"
+                size="sm" 
                 onClick={() => handleFilterTypeChange('month')}
                 className="w-full border-[1.5px]"
               >
@@ -264,11 +275,14 @@ export default function FilterDialog({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          {yearOptions.map((year) => (
-                            <SelectItem key={year} value={year.toString()}>
-                              {year}
-                            </SelectItem>
-                          ))}
+                          {yearOptions
+                            .slice()
+                            .reverse()
+                            .map((year) => (
+                              <SelectItem key={year} value={year.toString()}>
+                                {year}
+                              </SelectItem>
+                            ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -325,11 +339,14 @@ export default function FilterDialog({
                       </SelectTrigger>
                       <SelectContent>
                         <SelectGroup>
-                          {yearOptions.map((year) => (
-                            <SelectItem key={year} value={year.toString()}>
-                              {year}
-                            </SelectItem>
-                          ))}
+                          {yearOptions
+                            .slice()
+                            .reverse()
+                            .map((year) => (
+                              <SelectItem key={year} value={year.toString()}>
+                                {year}
+                              </SelectItem>
+                            ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
@@ -354,11 +371,14 @@ export default function FilterDialog({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        {yearOptions.map((year) => (
-                          <SelectItem key={year} value={year.toString()}>
-                            {year}
-                          </SelectItem>
-                        ))}
+                        {yearOptions
+                          .slice()
+                          .reverse()
+                          .map((year) => (
+                            <SelectItem key={year} value={year.toString()}>
+                              {year}
+                            </SelectItem>
+                          ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -473,3 +493,4 @@ export default function FilterDialog({
     </Dialog>
   );
 }
+
