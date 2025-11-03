@@ -128,10 +128,10 @@ export default function Summary({ onFilterChange }: SummaryProps = {}) {
 
   return (
     <div className="h-auto w-full flex flex-col">
-      <div className="summary-card flex flex-col gap-5 md:0 place-items-center">
-        <div className="page-header w-full flex items-center justify-between pb-5">
+      <div className="summary-card flex flex-col gap-5 place-items-center">
+        <div className="page-header w-full flex items-center justify-between pb-0 md:pb-5">
           <div className="head">
-            <h1 className="title text-3xl font-bold">Summary</h1>
+            <h1 className="title text-[27px] md:text-3xl font-bold">Summary</h1>
             <p className="hidden md:block md:text-base text-muted-foreground font-semibold">
               Overview of your financial tracks.
             </p>
@@ -148,7 +148,7 @@ export default function Summary({ onFilterChange }: SummaryProps = {}) {
             />
           </div>
         </div>
-        <div className="amount-info w-full grid grid-cols-2 grid-flow-row md: items-center justify-between text-foreground">
+        <div className="amount-info w-full grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-0 grid-flow-row items-center justify-between text-foreground">
           <div className="total">
             <div className="text-lg font-bold text-muted-foreground">
               Net Total

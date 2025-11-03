@@ -124,7 +124,9 @@ export default function Insights() {
       <div className="w-full h-full gap-10 items-center justify-center py-5 md:py-10">
         <div className="page-header w-full flex items-center justify-between pb-5">
           <div className="head">
-            <h1 className="title text-3xl font-bold">Insights</h1>
+            <h1 className="title text-[27px] md:text-3xl font-bold">
+              Insights
+            </h1>
             <p className="hidden md:block md:text-base text-muted-foreground font-semibold">
               Gain insights into your financial habits.
             </p>
@@ -141,31 +143,33 @@ export default function Insights() {
             />
           </div>
         </div>
-        <div className="charts-container flex flex-col gap-8 w-full">
-          <RadioGroup
-            onValueChange={(value) => setSelectedChart(value)}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-4 font-semibold"
-            value={selectedChart}
-          >
-            {chartOptions.map((option) => (
-              <Label
-                key={option.label}
-                htmlFor={option.label}
-                className={cn(
-                  `flex font-bold items-center justify-center rounded-md border-2 py-2 text-base cursor-pointer text-${option.label.toLowerCase()}`,
-                  selectedChart === option.label &&
-                    `bg-${option.label.toLowerCase()}/10 border-${option.label.toLowerCase()}/20 transition-all duration-75`
-                )}
-              >
-                <RadioGroupItem
-                  value={option.label}
-                  id={option.label}
-                  className="sr-only"
-                />
-                {option.label}
-              </Label>
-            ))}
-          </RadioGroup>
+        <div className="charts-container flex flex-col gap-6 w-full">
+          <div className="w-full overflow-x-auto">
+            <RadioGroup
+              onValueChange={(value) => setSelectedChart(value)}
+              className="grid w-[400px] md:w-full grid-cols-4 gap-2 md:gap-4 font-semibold"
+              value={selectedChart}
+            >
+              {chartOptions.map((option) => (
+                <Label
+                  key={option.label}
+                  htmlFor={option.label}
+                  className={cn(
+                    `flex font-bold items-center justify-center rounded-md border-2 py-2 text-sm md:text-base cursor-pointer text-${option.label.toLowerCase()}`,
+                    selectedChart === option.label &&
+                      `bg-${option.label.toLowerCase()}/10 border-${option.label.toLowerCase()}/20 transition-all duration-75`
+                  )}
+                >
+                  <RadioGroupItem
+                    value={option.label}
+                    id={option.label}
+                    className="sr-only"
+                  />
+                  {option.label}
+                </Label>
+              ))}
+            </RadioGroup>
+          </div>
           <div className="chart-display">
             {
               chartOptions.find((option) => option.label === selectedChart)
