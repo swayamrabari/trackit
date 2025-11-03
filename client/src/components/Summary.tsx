@@ -216,7 +216,7 @@ export default function Summary({ onFilterChange }: SummaryProps = {}) {
         ].map((item) => (
           <div
             key={item.key}
-            className={`py-2.5 px-4 bg-${item.key} bg-opacity-10 border-2 border-${item.key}/20 rounded-lg`}
+            className={`py-2.5 px-3 bg-${item.key} bg-opacity-10 border-2 border-${item.key}/20 rounded-xl`}
           >
             <div
               className={`text-base mb-1 ${item.textClass} flex items-center justify-between`}

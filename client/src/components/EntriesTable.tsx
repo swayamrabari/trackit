@@ -92,7 +92,16 @@ export default function EntriesTable({
 
       return true;
     });
-  }, [entries, type, category, filterType, filterMonth, filterYear, startDate, endDate]);
+  }, [
+    entries,
+    type,
+    category,
+    filterType,
+    filterMonth,
+    filterYear,
+    startDate,
+    endDate,
+  ]);
 
   // Memoize sorted entries
   const sortedEntries = useMemo(() => {
@@ -111,7 +120,7 @@ export default function EntriesTable({
   // Calculate pagination
   const isEntriesPage = location.pathname === '/entries';
   const totalPages = Math.ceil(sortedEntries.length / ITEMS_PER_PAGE);
-  
+
   const displayEntries = useMemo(() => {
     if (location.pathname === '/') {
       return sortedEntries.slice(0, 10);
@@ -204,24 +213,26 @@ export default function EntriesTable({
       </Table>
       <div className="w-full">
         {/* Mobile View Card */}
-        <div className="flex flex-col gap-4 sm:hidden">
+        <div className="flex flex-col gap-3 sm:hidden">
           {displayEntries.map((entry) => (
             <div
               key={entry.id}
-              className={`rounded-lg p-4 ${
+              className={`rounded-xl px-3 py-2.5 ${
                 bgClasses[entry.type] || 'bg-secondary'
-              } bg-opacity-5 border-2 border-${entry.type} border-opacity-20`}
+              }/5 border-2 border-${entry.type}/20 hover:${
+                hoverBgClasses[entry.type]
+              } transition-colors`}
             >
               {/* Top Row: Category and Actions */}
-              <div className="flex justify-between items-start mb-3">
+              <div className="flex justify-between items-center mb-2">
                 <span
-                  className={`text-xs font-semibold capitalize ${
+                  className={`text-[12px] font-semibold capitalize ${
                     bgClasses[entry.type] || 'bg-secondary'
-                  } text-${entry.type} bg-opacity-20 px-2.5 py-1 rounded-md`}
+                  }/15 text-${entry.type} px-2 py-0.5 rounded-sm`}
                 >
                   {entry.category}
                 </span>
-                <div className="flex gap-1">
+                <div className="flex gap-0.5">
                   <Button
                     variant="ghost"
                     size="icon"
@@ -250,18 +261,15 @@ export default function EntriesTable({
               </div>
 
               {/* Middle: Amount (Most Prominent) */}
-              <div className="mb-3">
-                <span className={`text-2xl font-bold text-${entry.type}`}>
+              <div className="flex items-end justify-between text-[10px] font-semibold">
+                <span
+                  className={`text-xl font-bold tracking-tight text-${entry.type}`}
+                >
                   {entry.amount.toLocaleString('en-IN', {
                     minimumFractionDigits: 2,
                   })}
                 </span>
-              </div>
-
-              {/* Bottom: Type and Date */}
-              <div className="flex items-center justify-between text-xs text-muted-foreground font-semibold border-border/50">
-                <span className="capitalize">{entry.type}</span>
-                <span>
+                <span className="text-foreground/70">
                   {new Date(entry.date)
                     .toLocaleDateString('en-IN', {
                       day: '2-digit',
@@ -297,16 +305,18 @@ export default function EntriesTable({
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          
+
           <div className="flex items-center gap-2 font-semibold text-base">
-            <span>Page :</span>
+            <span>Page </span>
             <span className="text-primary font-bold">{currentPage}</span>
           </div>
-          
+
           <Button
             variant="outline"
             size="icon"
-            onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+            onClick={() =>
+              setCurrentPage((prev) => Math.min(totalPages, prev + 1))
+            }
             disabled={currentPage === totalPages}
             className="h-10 w-10"
             aria-label="Next page"
