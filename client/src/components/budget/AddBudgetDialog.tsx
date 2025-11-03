@@ -135,10 +135,14 @@ export default function AddBudgetDialog({
                   className={cn(
                     `flex flex-1 font-bold items-center justify-center rounded-md border-[1.5px] min-h-10 text-${btype}`,
                     type === btype &&
-                    `bg-${btype}/10 border-${btype} transition-all duration-75`
+                      `bg-${btype}/10 border-${btype} transition-all duration-75`
                   )}
                 >
-                  <RadioGroupItem value={btype} id={uniqueId} className="sr-only" />
+                  <RadioGroupItem
+                    value={btype}
+                    id={uniqueId}
+                    className="sr-only"
+                  />
                   {btype.charAt(0).toUpperCase() + btype.slice(1)}
                 </Label>
               );
@@ -181,10 +185,12 @@ export default function AddBudgetDialog({
           {error && (
             <div className="text-sm text-red-500 font-medium">{error}</div>
           )}
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="font-semibold mt-3 w-full"
-            disabled={!type || !category || !amount || !period || Number(amount) <= 0}
+            disabled={
+              !type || !category || !amount || !period || Number(amount) <= 0
+            }
           >
             Add
           </Button>

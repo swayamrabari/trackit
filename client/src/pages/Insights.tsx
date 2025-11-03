@@ -144,7 +144,7 @@ export default function Insights() {
           </div>
         </div>
         <div className="charts-container flex flex-col gap-6 w-full">
-          <div className="w-full overflow-x-auto">
+          <div className="w-full overflow-x-auto page">
             <RadioGroup
               onValueChange={(value) => setSelectedChart(value)}
               className="grid w-[400px] md:w-full grid-cols-4 gap-2 md:gap-4 font-semibold"
