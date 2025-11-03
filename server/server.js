@@ -12,27 +12,31 @@ const {
 require('dotenv').config();
 
 // Validate required environment variables
-const requiredEnvVars = [
-  'MONGOURI',
-  'JWT_SECRET',
-  'CLIENT_URL',
+const requiredEnvVars = ['MONGOURI', 'JWT_SECRET', 'CLIENT_URL'];
+
+const optionalEnvVars = [
+  'OPENAI_API_KEY',
+  'EMAIL_USER',
+  'EMAIL_PASS',
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_CLIENT_SECRET',
 ];
 
-const optionalEnvVars = ['OPENAI_API_KEY', 'EMAIL_USER', 'EMAIL_PASS', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET'];
-
-const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
 if (missingVars.length > 0) {
   console.error('❌ Missing required environment variables:');
-  missingVars.forEach(varName => console.error(`   - ${varName}`));
+  missingVars.forEach((varName) => console.error(`   - ${varName}`));
   console.error('\nPlease set these in your .env file');
   process.exit(1);
 }
 
 // Warn about missing optional vars
-const missingOptional = optionalEnvVars.filter(varName => !process.env[varName]);
+const missingOptional = optionalEnvVars.filter(
+  (varName) => !process.env[varName]
+);
 if (missingOptional.length > 0 && process.env.NODE_ENV === 'production') {
   console.warn('⚠️  Missing optional environment variables:');
-  missingOptional.forEach(varName => console.warn(`   - ${varName}`));
+  missingOptional.forEach((varName) => console.warn(`   - ${varName}`));
 }
 
 setupProcessErrorHandlers();
@@ -40,10 +44,12 @@ setupProcessErrorHandlers();
 const app = express();
 
 // Security middleware
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  contentSecurityPolicy: false, // Adjust based on your needs
-}));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    contentSecurityPolicy: false, // Adjust based on your needs
+  })
+);
 
 app.use(
   cors({
@@ -63,6 +69,10 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/chat', require('./routes/chat'));
+app.use('/api/entries', require('./routes/entries'));
+app.use('/api/budgets', require('./routes/budgets'));
+app.use('/api/categories', require('./routes/categories'));
 
 const assistantLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
@@ -70,10 +80,6 @@ const assistantLimiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.',
 });
 app.use('/api/assistant', assistantLimiter, require('./routes/assistant'));
-app.use('/api/chat', require('./routes/chat'));
-app.use('/api/entries', require('./routes/entries'));
-app.use('/api/budgets', require('./routes/budgets'));
-app.use('/api/categories', require('./routes/categories'));
 
 // 404 handler - catches all unmatched routes (must be before error handler)
 app.use((req, res, next) => {
