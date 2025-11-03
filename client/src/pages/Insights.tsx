@@ -147,7 +147,7 @@ export default function Insights() {
           <div className="w-full overflow-x-auto page">
             <RadioGroup
               onValueChange={(value) => setSelectedChart(value)}
-              className="grid w-[400px] md:w-full grid-cols-4 gap-2 md:gap-4 font-semibold"
+              className="flex gap-2 md:grid w-[400px] md:w-full grid-cols-4 gap-2 md:gap-4 font-semibold"
               value={selectedChart}
             >
               {chartOptions.map((option) => (
@@ -155,7 +155,7 @@ export default function Insights() {
                   key={option.label}
                   htmlFor={option.label}
                   className={cn(
-                    `flex font-bold items-center justify-center rounded-md border-2 py-2 text-sm md:text-base cursor-pointer text-${option.label.toLowerCase()}`,
+                    `flex font-bold items-center justify-center rounded-md border-2 py-2 px-4 text-sm md:text-base cursor-pointer text-${option.label.toLowerCase()}`,
                     selectedChart === option.label &&
                       `bg-${option.label.toLowerCase()}/10 border-${option.label.toLowerCase()}/20 transition-all duration-75`
                   )}
