@@ -588,7 +588,7 @@ export default function Assistant() {
       </div>
 
       {/* Fixed Input - Mobile Only */}
-      <div className="w-full md:max-w-[700px] md:mx-auto bg-background pb-4 pt-4 md:pb-8 md:pt-0 md:px-0">
+      <div className="w-full md:max-w-[700px] sticky bottom-0 md:mx-auto bg-background pb-4 pt-4 md:pb-8 md:pt-0 md:px-0">
         <div className="textarea-container h-fit w-full relative">
           <form
             onSubmit={(e) => {
