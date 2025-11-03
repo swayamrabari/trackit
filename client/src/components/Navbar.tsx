@@ -1,8 +1,16 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import navOptions from '../constants/navOtions';
+import { useAuthStore } from '@/store/authStore';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { LogOut } from 'lucide-react';
 
 export default function Navbar() {
+  const user = useAuthStore((s) => s.user);
   return (
     <>
       <header className="sticky lg:hidden top-0 w-screen border-b flex items-center justify-center border-border bg-background z-30">
@@ -27,14 +35,27 @@ export default function Navbar() {
               </NavLink>
             ))}
           </nav>
-          {/* Avatar */}
-          <div className="avatar h-10 w-10 bg-muted/50 rounded-full flex items-center justify-center">
-            <div className="flex h-full w-full items-center justify-center rounded-full bg-secondary">
-              <span className="text-secondary-foreground/80 font-semibold text-base">
-                SR
-              </span>
-            </div>
-          </div>
+          {/* Avatar + Account actions */}
+          <Popover>
+            <PopoverTrigger className="avatar h-10 w-10 bg-muted/50 rounded-full flex items-center justify-center">
+              <div className="flex h-full w-full items-center justify-center rounded-full bg-secondary">
+                <span className="text-secondary-foreground/80 font-semibold text-base">
+                  {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+                </span>
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-40 p-1.5 rounded-xl" align="end">
+              <div className="flex flex-col gap-1.5">
+                <div
+                  className="flex text-expense font-semibold text-sm gap-2 items-center cursor-pointer bg-expense/15 hover:bg-expense/10 transition-all rounded-md p-2"
+                  onClick={() => useAuthStore.getState().logout()}
+                >
+                  <LogOut className="inline h-5 w-5" />
+                  <span>Logout</span>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </header>
     </>

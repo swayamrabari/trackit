@@ -30,39 +30,6 @@ function TypingDots() {
   );
 }
 
-function ThinkingMessage({ content }: { content: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.3 }}
-      className="flex items-center gap-2.5 px-4 py-2.5 bg-primary/10 border border-primary/20 rounded-2xl text-sm mt-0.5"
-    >
-      {content && (
-        <span className="text-primary/90 font-medium">{content}</span>
-      )}
-      <div className="flex items-center gap-1 ml-1">
-        <motion.span
-          className="w-1.5 h-1.5 bg-primary rounded-full"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.2, repeat: Infinity, delay: 0 }}
-        />
-        <motion.span
-          className="w-1.5 h-1.5 bg-primary rounded-full"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.2, repeat: Infinity, delay: 0.2 }}
-        />
-        <motion.span
-          className="w-1.5 h-1.5 bg-primary rounded-full"
-          animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
-          transition={{ duration: 1.2, repeat: Infinity, delay: 0.4 }}
-        />
-      </div>
-    </motion.div>
-  );
-}
-
 function MessageContent({
   content,
   isUser,
@@ -144,7 +111,7 @@ function MessageContent({
     return () => {
       clearInterval(interval);
     };
-  }, [content, isUser, messageId, shouldAnimate]);
+  }, [content, isUser, messageId, shouldAnimate, onAnimationStart, onAnimationEnd]);
 
   if (isUser) return <>{content}</>;
 
@@ -265,7 +232,9 @@ export default function Assistant() {
   // Track when session changes to reset animation tracking for historical messages
   useEffect(() => {
     // When switching to a different session, mark all existing messages as already animated
-    const existingMessageIds = messages
+    const state = useChatStore.getState();
+    const session = state.sessions.find((s) => s.id === state.currentSessionId);
+    const existingMessageIds = (session?.messages || [])
       .filter((m) => m.content && m.content.trim().length > 0)
       .map((m) => m.id);
 
@@ -629,7 +598,6 @@ export default function Assistant() {
             <Button
               className="absolute bg-primary h-10 w-10 rounded-full right-2.5 top-1/2 -translate-y-1/2"
               disabled={!input.trim() || isTyping}
-              onClick={handleSend}
               type="submit"
             >
               <ArrowUp className="!h-6 !w-6" />
