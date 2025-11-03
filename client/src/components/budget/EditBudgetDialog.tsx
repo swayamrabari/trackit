@@ -48,7 +48,9 @@ export function EditBudgetDialog({
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState('');
   const [period, setPeriod] = useState<Budget['period']>('monthly');
-  const categories = useCategoriesStore((s) => s.categories[type as keyof typeof s.categories] || []);
+  const categories = useCategoriesStore(
+    (s) => s.categories[type as keyof typeof s.categories] || []
+  );
 
   // Initialize form when budget changes
   useEffect(() => {
@@ -93,8 +95,8 @@ export function EditBudgetDialog({
             className="num-inp caret-muted-foreground h-fit text-4xl appearance-none border-2 focus:outline-none tracking-wide"
             required
           />
-          <div className="flex flex-col gap-2">
-            <Label className="mt-1 font-semibold">Select Budget Type</Label>
+          <div className="flex flex-col gap-3">
+            <Label className="mt-3 font-semibold">Select Budget Type</Label>
             <RadioGroup
               value={type}
               onValueChange={(value) => {
@@ -110,7 +112,7 @@ export function EditBudgetDialog({
                     key={opt.value}
                     htmlFor={uniqueId}
                     className={cn(
-                      `flex flex-1 font-bold items-center justify-center rounded-md border-[1.5px] h-10 text-${opt.value}`,
+                      `flex flex-1 font-bold items-center justify-center rounded-md border-[1.5px] min-h-10 text-${opt.value}`,
                       type === opt.value &&
                         `bg-${opt.value}/10 border-${opt.value} transition-all duration-75`
                     )}

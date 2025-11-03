@@ -70,7 +70,7 @@ function AppLayout() {
 
       <div className="flex flex-col flex-1 w-full min-w-0">
         <Navbar />
-        <div className="page px-3 w-full md:px-12 flex-1 overflow-y-auto">
+        <div className="page px-5 w-full md:px-12 flex-1 overflow-y-auto">
           <div className="max-w-[1000px] mx-auto w-full">
             <AnimatePresence
               mode="wait"

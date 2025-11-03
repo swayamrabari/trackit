@@ -95,11 +95,12 @@ function BudgetCard({
         </div>
         <div className="flex items-center gap-2 *:rounded-md *:px-2.5 *:py-1 *:text-xs *:font-semibold">
           <div
-            className={`${status.textColor
-              } bg-opacity-15 ${status.color.replace(
-                'bg-',
-                'bg-opacity-10 bg-'
-              )}`}
+            className={`${
+              status.textColor
+            } bg-opacity-15 ${status.color.replace(
+              'bg-',
+              'bg-opacity-10 bg-'
+            )}`}
           >
             {status.label}
           </div>
@@ -187,15 +188,18 @@ export default function BudgetPage() {
 
   // Helper function to get type-specific classes
   const getTypeClasses = (type: Budget['type']) => {
-    const classMap: Record<Budget['type'], {
-      text: string;
-      bg: string;
-      border: string;
-      bgOpacity: string;
-      borderOpacity: string;
-      bgCard: string;
-      borderCard: string;
-    }> = {
+    const classMap: Record<
+      Budget['type'],
+      {
+        text: string;
+        bg: string;
+        border: string;
+        bgOpacity: string;
+        borderOpacity: string;
+        bgCard: string;
+        borderCard: string;
+      }
+    > = {
       expense: {
         text: 'text-expense',
         bg: 'bg-expense',
@@ -257,7 +261,7 @@ export default function BudgetPage() {
       <div className="w-full h-full gap-10 items-center justify-center py-5 md:py-10">
         <div className="page-header flex items-center justify-between pb-5">
           <div>
-            <h1 className="title text-3xl font-bold">Budgets</h1>
+            <h1 className="title text-[27px] md:text-3xl font-bold">Budgets</h1>
             <p className="hidden md:block md:text-base text-muted-foreground font-semibold">
               Manage your budgets and track your spending
             </p>
@@ -272,10 +276,10 @@ export default function BudgetPage() {
         </div>
 
         {/* Tabbed interface for transaction types */}
-        <div className="w-full mb-8">
+        <div className="w-full mb-6 md:mb-10">
           <RadioGroup
             onValueChange={(value) => setSelectedType(value as Budget['type'])}
-            className="grid grid-cols-3 gap-4 font-semibold"
+            className="grid grid-cols-3 gap-2 md:gap-4 font-semibold"
             value={selectedType}
           >
             {(['expense', 'savings', 'investment'] as Budget['type'][]).map(
@@ -286,10 +290,10 @@ export default function BudgetPage() {
                     key={type}
                     htmlFor={type}
                     className={cn(
-                      'flex font-bold items-center justify-center rounded-md border-2 py-2 text-base cursor-pointer',
+                      'flex font-bold items-center justify-center rounded-md border-2 py-2 text-sm md:text-base cursor-pointer',
                       typeClasses.text,
                       selectedType === type &&
-                      `${typeClasses.bgOpacity} ${typeClasses.borderOpacity} transition-all duration-75`
+                        `${typeClasses.bgOpacity} ${typeClasses.borderOpacity} transition-all duration-75`
                     )}
                   >
                     <RadioGroupItem

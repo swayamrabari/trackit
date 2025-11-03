@@ -80,7 +80,7 @@ export default function EntriesTableHead({
     setLocalFilterYear(null);
     setLocalStartDate(undefined);
     setLocalEndDate(undefined);
-    
+
     // Apply the reset immediately (for reset button outside dialog)
     onTypeChange('');
     onCategoryChange('');
@@ -143,11 +143,11 @@ export default function EntriesTableHead({
     // Apply all filters (type, category, and time) when Apply button is clicked
     const start = localStartDate ? localStartDate : undefined;
     const end = localEndDate ? localEndDate : undefined;
-    
+
     // Apply type and category filters
     onTypeChange(localType);
     onCategoryChange(localCategory);
-    
+
     // Apply time filters
     onTimeFilterChange?.(
       localFilterType,
@@ -160,12 +160,12 @@ export default function EntriesTableHead({
 
   return (
     <div
-      className={`w-full bg-background py-5 flex items-center justify-between border-none sm:border-b border-border ${className}`}
+      className={`w-full bg-background pb-5 md:py-5 flex items-center justify-between border-none sm:border-b border-border ${className}`}
     >
       <div>
         <div
           className={`title font-bold ${
-            location.pathname === '/' ? 'text-2xl' : 'text-3xl'
+            location.pathname === '/' ? 'text-2xl' : 'text-[27px] md:text-3xl'
           }`}
         >
           Entries
@@ -199,8 +199,8 @@ export default function EntriesTableHead({
                   </DialogDescription>
                 </DialogHeader>
                 <Label className="text-sm font-medium block">Type</Label>
-                <Select 
-                  value={localType} 
+                <Select
+                  value={localType}
                   onValueChange={(value) => {
                     setLocalType(value);
                     // Reset category when type changes
@@ -234,7 +234,11 @@ export default function EntriesTableHead({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      {(categories[localType as keyof typeof categories] as string[] || []).map((cat) => (
+                      {(
+                        (categories[
+                          localType as keyof typeof categories
+                        ] as string[]) || []
+                      ).map((cat) => (
                         <SelectItem key={cat} value={cat}>
                           {cat.charAt(0).toUpperCase() + cat.slice(1)}
                         </SelectItem>

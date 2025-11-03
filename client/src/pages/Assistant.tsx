@@ -39,7 +39,9 @@ function ThinkingMessage({ content }: { content: string }) {
       transition={{ duration: 0.3 }}
       className="flex items-center gap-2.5 px-4 py-2.5 bg-primary/10 border border-primary/20 rounded-2xl text-sm mt-0.5"
     >
-      {content && <span className="text-primary/90 font-medium">{content}</span>}
+      {content && (
+        <span className="text-primary/90 font-medium">{content}</span>
+      )}
       <div className="flex items-center gap-1 ml-1">
         <motion.span
           className="w-1.5 h-1.5 bg-primary rounded-full"
@@ -60,7 +62,6 @@ function ThinkingMessage({ content }: { content: string }) {
     </motion.div>
   );
 }
-
 
 function MessageContent({
   content,
@@ -161,7 +162,7 @@ function MessageContent({
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25 }}
-      className="prose prose-sm text-base text-foreground font-normal dark:prose-invert max-w-none
+      className="prose prose-sm text-base text-foreground font-medium dark:prose-invert max-w-none
         prose-p:prose-p:leading-relaxed
         prose-ul:my-2 prose-ul:pl-5 prose-ul:list-disc
         prose-ol:my-2 prose-ol:pl-5 prose-ol:list-decimal
@@ -217,7 +218,9 @@ export default function Assistant() {
           await createNewSession();
         } else {
           // Find an empty session first, or create one if none exists
-          const emptySession = state.sessions.find((s) => s.messages.length === 0);
+          const emptySession = state.sessions.find(
+            (s) => s.messages.length === 0
+          );
           if (emptySession) {
             setCurrentSession(emptySession.id);
           } else {
@@ -227,10 +230,14 @@ export default function Assistant() {
         }
       } else {
         // Current session exists, verify it's still valid
-        const currentSession = state.sessions.find((s) => s.id === state.currentSessionId);
+        const currentSession = state.sessions.find(
+          (s) => s.id === state.currentSessionId
+        );
         if (!currentSession) {
           // Current session was deleted, find empty or create new
-          const emptySession = state.sessions.find((s) => s.messages.length === 0);
+          const emptySession = state.sessions.find(
+            (s) => s.messages.length === 0
+          );
           if (emptySession) {
             setCurrentSession(emptySession.id);
           } else {
@@ -241,7 +248,12 @@ export default function Assistant() {
     };
 
     initializeSession();
-  }, [isAuthenticated, loadSessionsFromDatabase, createNewSession, setCurrentSession]);
+  }, [
+    isAuthenticated,
+    loadSessionsFromDatabase,
+    createNewSession,
+    setCurrentSession,
+  ]);
 
   const currentSession = getCurrentSession();
   const messages = currentSession?.messages || [];
@@ -466,10 +478,13 @@ export default function Assistant() {
   ];
 
   return (
-    <div className="w-full md:h-svh flex flex-col">
-      <div className="w-full flex items-center justify-between py-5 md:pt-10 border-b">
+    <div className="w-full h-full md:h-svh flex flex-col relative md:static">
+      {/* Fixed Header - Mobile Only */}
+      <div className="w-full flex items-center justify-between py-5 md:pt-10 sticky top-0 left-0 right-0 z-30 bg-background md:relative md:top-auto md:left-auto md:right-auto md:z-auto md:px-0">
         <div className="head">
-          <h1 className="title text-3xl font-bold">TrackIt AI</h1>
+          <h1 className="title text-[27px] md:text-3xl font-bold">
+            TrackIt AI
+          </h1>
           <p className="hidden md:block text-sm md:text-base text-muted-foreground font-semibold">
             Your personal assistant for TrackIt.
           </p>
@@ -479,7 +494,10 @@ export default function Assistant() {
         <div className="flex items-center gap-3">
           <Popover open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
             <PopoverTrigger asChild>
-              <Button variant="secondary" className="gap-2">
+              <Button
+                variant="secondary"
+                className="gap-2 w-10 sm:w-fit font-semibold"
+              >
                 <History className="stroke-[2.5px]" />
                 <span className="hidden sm:inline">History</span>
               </Button>
@@ -501,15 +519,16 @@ export default function Assistant() {
           <Button
             onClick={handleNewChat}
             variant={'secondary'}
-            className="gap-2"
+            className="gap-2 w-10 sm:w-fit font-semibold"
           >
             <Plus className="stroke-[2.5px]" />
-            <span className="hidden sm:inline">New Chat</span>
+            <span className="hidden sm:block">New Chat</span>
           </Button>
         </div>
       </div>
 
-      <div className="flex-1 page overflow-y-auto w-full max-w-[700px] mx-auto px-1 py-4 md:py-6">
+      {/* Scrollable Content Area - Mobile Only */}
+      <div className="flex-1 page overflow-y-auto w-full max-w-[700px] mx-auto px-1 pt-5 pb-32 md:pt-4 md:pb-4 md:py-6">
         {messages.length === 0 ? (
           <div className="flex flex-col h-full items-center justify-center gap-4 md:gap-6">
             <img src={logo} alt="TrackIt Logo" className="w-16 opacity-90" />
@@ -540,33 +559,18 @@ export default function Assistant() {
           <div className="flex flex-col gap-4">
             {messages.map((m, index) => {
               const isUser = m.role === 'user';
-              const isThinking = m.role === 'thinking';
               const shouldAnimate = !animatedMessages.has(m.id) && !isUser;
-
-              if (isThinking) {
-                return (
-                  <div
-                    key={m.id}
-                    className="flex w-full gap-3 items-start justify-start"
-                  >
-                    {/* TrackIt avatar for thinking message */}
-                    <div className="h-8 w-8 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
-                      <img src={logo} alt="TrackIt" className="w-5 h-5" />
-                    </div>
-                    <ThinkingMessage content={m.content} />
-                  </div>
-                );
-              }
 
               return (
                 <div
                   key={m.id}
-                  className={`flex w-full gap-3 items-start ${isUser ? 'justify-end' : 'justify-start'
-                    } ${index !== 0 && isUser ? 'mt-10' : ''}`}
+                  className={`flex w-full gap-3 items-start ${
+                    isUser ? 'justify-end' : 'justify-start'
+                  } ${index !== 0 && isUser ? 'mt-10' : ''}`}
                 >
                   {/* Show avatar based on message role */}
                   {!isUser && (
-                    <div className="h-9 w-9 flex-shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="h-9 w-9 hidden md:flex flex-shrink-0 rounded-full bg-primary/10 items-center justify-center">
                       <img src={logo} alt="TrackIt" className="w-5 h-5" />
                     </div>
                   )}
@@ -574,10 +578,11 @@ export default function Assistant() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.25 }}
-                    className={`max-w-[85%] md:max-w-[70%] rounded-xl text-sm font-medium md:text-base px-3 py-[7px] leading-6 ${isUser
-                      ? 'bg-secondary text-secondary-foreground'
-                      : '!px-0 py-0.5'
-                      }`}
+                    className={`max-w-[85%] md:max-w-[70%] rounded-xl text-sm font-medium md:text-base px-3 py-[7px] leading-6 ${
+                      isUser
+                        ? 'bg-secondary text-secondary-foreground'
+                        : '!px-0 py-0.5'
+                    }`}
                   >
                     {m.content ? (
                       <MessageContent
@@ -594,7 +599,7 @@ export default function Assistant() {
                   </motion.div>
                   {/* Show user avatar on the right */}
                   {isUser && (
-                    <div className="h-9 w-9 flex-shrink-0 rounded-full bg-foreground text-secondary text-base flex items-center justify-center font-bold">
+                    <div className="h-9 w-9 hidden md:flex flex-shrink-0 rounded-full bg-foreground text-secondary text-base items-center justify-center font-bold">
                       {username.charAt(0).toUpperCase()}
                     </div>
                   )}
@@ -606,7 +611,8 @@ export default function Assistant() {
         )}
       </div>
 
-      <div className="w-full max-w-[700px] mx-auto bg-background pb-4 pt-4 md:pb-8 md:pt-0 px-4 md:px-0 box-border">
+      {/* Fixed Input - Mobile Only */}
+      <div className="w-full md:max-w-[700px] md:mx-auto bg-background pb-4 pt-4 md:pb-8 md:pt-0 md:px-0 box-border sticky bottom-0 left-0 right-0 z-30 md:relative md:bottom-auto md:left-auto md:right-auto md:z-auto border-t border-border md:border-0">
         <div className="textarea-container h-fit w-full relative">
           <form
             onSubmit={(e) => {

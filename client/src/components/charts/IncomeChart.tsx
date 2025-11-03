@@ -219,7 +219,7 @@ export function IncomeChart({
             {totalIncomeByCategory.map((item) => (
               <div
                 key={item.category}
-                className="grid grid-cols-[50%_25%_25%] items-center text-sm p-2 pr-4 bg-secondary rounded-md"
+                className="grid grid-cols-[60%_40%] md:grid-cols-[50%_25%_25%] items-center text-sm p-2 pr-4 bg-secondary rounded-md"
               >
                 <div className="capitalize font-semibold flex items-center gap-3">
                   <div className="h-6 w-1 rounded-full bg-income flex-shrink-0"></div>
@@ -230,7 +230,7 @@ export function IncomeChart({
                     minimumFractionDigits: 2,
                   })}
                 </div>
-                <div className="text-right text-muted-foreground font-semibold">
+                <div className="text-right hidden md:block text-muted-foreground font-semibold">
                   {item.percentage}%
                 </div>
               </div>
@@ -247,8 +247,8 @@ export function IncomeChart({
                 Track your income trends over time
                 {totalLineChart > 0
                   ? ` - Total: ${totalLineChart.toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}`
+                      minimumFractionDigits: 2,
+                    })}`
                   : ''}
               </CardDescription>
             </div>

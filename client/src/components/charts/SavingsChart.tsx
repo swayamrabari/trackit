@@ -40,7 +40,9 @@ export function SavingsChart({
   const allEntries = useEntriesStore((state) => state.entries);
 
   const entries = useMemo(() => {
-    let filteredEntries = allEntries.filter((entry) => entry.type === 'savings');
+    let filteredEntries = allEntries.filter(
+      (entry) => entry.type === 'savings'
+    );
 
     if (filterType === 'all') {
       return filteredEntries;
