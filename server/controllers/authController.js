@@ -8,6 +8,23 @@ const sendOtpMail = require('../utils/sendOtpMail');
 const sendPasswordResetMail = require('../utils/sendPasswordResetMail');
 const generateToken = require('../utils/generateToken');
 
+// Helper function to get cookie options (required for Safari/Samsung Internet compatibility)
+const getCookieOptions = () => {
+  // Check if we're in production - use multiple checks for reliability
+  const isProduction = 
+    process.env.NODE_ENV === 'production' || 
+    process.env.RENDER === 'true' || 
+    process.env.FORCE_SECURE_COOKIES === 'true';
+  
+  return {
+    httpOnly: true,
+    secure: isProduction, // Must be true when sameSite is 'none' (required for Safari)
+    sameSite: isProduction ? 'none' : 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    path: '/', // Explicit path
+  };
+};
+
 exports.registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -71,12 +88,8 @@ exports.verifyOtp = async (req, res) => {
     await PendingUser.deleteOne({ email });
     const token = generateToken(user);
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    // Use helper function for consistent cookie options (Safari/Samsung Internet fix)
+    res.cookie('token', token, getCookieOptions());
 
     res.status(201).json({
       user: {
@@ -129,12 +142,9 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
     const token = generateToken(user);
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    
+    // Use helper function for consistent cookie options (Safari/Samsung Internet fix)
+    res.cookie('token', token, getCookieOptions());
 
     res.status(200).json({
       user: {
@@ -151,7 +161,14 @@ exports.loginUser = async (req, res) => {
 };
 
 exports.logoutUser = (req, res) => {
-  res.clearCookie('token');
+  // Clear cookie with same options used to set it (required for Safari/Samsung Internet)
+  const cookieOptions = getCookieOptions();
+  res.clearCookie('token', {
+    httpOnly: cookieOptions.httpOnly,
+    secure: cookieOptions.secure,
+    sameSite: cookieOptions.sameSite,
+    path: cookieOptions.path,
+  });
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
