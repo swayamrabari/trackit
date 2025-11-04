@@ -43,6 +43,14 @@ setupProcessErrorHandlers();
 
 const app = express();
 
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+  });
+});
+
 // Security middleware
 app.use(
   helmet({
