@@ -274,7 +274,6 @@ export default function Assistant() {
   const fadeInResponse = (html: string, msgId: string) => {
     const sessionId = currentSessionId;
     if (!sessionId) {
-      console.error('No session ID available for fadeInResponse');
       return;
     }
     updateMessage(sessionId, msgId, html);
@@ -295,15 +294,10 @@ export default function Assistant() {
     // If no session ID or session doesn't exist, create a new session
     if (!sessionId || !session) {
       sessionId = await createNewSession();
-      if (!sessionId) {
-        console.error('Failed to create session');
+      if (!sessionId || !getCurrentSession()) {
         return;
       }
       session = getCurrentSession();
-      if (!session) {
-        console.error('Failed to get session after creation');
-        return;
-      }
     }
 
     // If the current session has messages and user wants to start fresh,
@@ -329,7 +323,6 @@ export default function Assistant() {
     try {
       await handleAssistantResponse(trimmed, assistantMsgId);
     } catch (error) {
-      console.error('Error in handleSend:', error);
       fadeInResponse('There was an error. Please try again.', assistantMsgId);
     } finally {
       setIsTyping(false);
@@ -347,7 +340,6 @@ export default function Assistant() {
   ) => {
     const sessionId = currentSessionId;
     if (!sessionId) {
-      console.error('No session ID available for assistant response');
       return;
     }
 
@@ -376,11 +368,8 @@ export default function Assistant() {
         conversationHistory
       );
 
-      console.log('Assistant response data:', data);
-
       // Check for errors first
       if (data.error) {
-        console.error('Assistant returned an error:', data.error);
         fadeInResponse(data.error, assistantMsgId);
         return;
       }

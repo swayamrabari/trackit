@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const logger = require('./logger');
 require('dotenv').config();
 
 const sendPasswordResetMail = async (toEmail, otp, type = 'forgot-password') => {
@@ -27,9 +28,9 @@ const sendPasswordResetMail = async (toEmail, otp, type = 'forgot-password') => 
     };
     
     await transporter.sendMail(mailOptions);
-    console.log('Password reset OTP email sent successfully');
+    logger.info('Password reset OTP email sent successfully', { toEmail, type });
   } catch (error) {
-    console.error('Error sending password reset OTP email:', error);
+    logger.error('Error sending password reset OTP email', { error: error.message, toEmail, type });
     throw new Error('Could not send OTP email');
   }
 };

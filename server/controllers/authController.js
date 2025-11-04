@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const logger = require('../utils/logger');
 const PendingUser = require('../models/PendingUser');
 const User = require('../models/User');
 const PasswordReset = require('../models/PasswordReset');
@@ -60,7 +61,7 @@ exports.registerUser = async (req, res) => {
 
     res.status(200).json({ message: 'OTP sent to email' });
   } catch (error) {
-    console.error('Error in register:', error);
+    logger.error('Error in register', { error: error.message, stack: error.stack });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -95,13 +96,7 @@ exports.verifyOtp = async (req, res) => {
     const cookieOptions = getCookieOptions();
     res.cookie('token', token, cookieOptions);
 
-    // Debug logging for Safari/Samsung Internet cookie issues
-    console.log('OTP Verification - Cookie set:', {
-      origin: req.headers.origin,
-      userAgent: req.headers['user-agent']?.includes('Safari') ? 'Safari' : req.headers['user-agent']?.includes('Samsung') ? 'Samsung' : 'Other',
-      cookieOptions,
-      cookiesReceived: Object.keys(req.cookies || {}),
-    });
+    logger.info('User registered successfully', { userId: user._id, email: user.email });
 
     res.status(201).json({
       user: {
@@ -112,7 +107,7 @@ exports.verifyOtp = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error('Error in verifyOtp:', error);
+    logger.error('Error in verifyOtp', { error: error.message, stack: error.stack, email: req.body.email });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -136,7 +131,7 @@ exports.resendOtp = async (req, res) => {
 
     res.status(200).json({ message: 'New OTP resent to email' });
   } catch (error) {
-    console.error('Error in resendOtp:', error);
+    logger.error('Error in resendOtp', { error: error.message, stack: error.stack, email: req.body.email });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -159,13 +154,7 @@ exports.loginUser = async (req, res) => {
     const cookieOptions = getCookieOptions();
     res.cookie('token', token, cookieOptions);
 
-    // Debug logging for Safari/Samsung Internet cookie issues
-    console.log('Login - Cookie set:', {
-      origin: req.headers.origin,
-      userAgent: req.headers['user-agent']?.includes('Safari') ? 'Safari' : req.headers['user-agent']?.includes('Samsung') ? 'Samsung' : 'Other',
-      cookieOptions,
-      cookiesReceived: Object.keys(req.cookies || {}),
-    });
+    logger.info('User logged in successfully', { userId: user._id, email: user.email });
 
     res.status(200).json({
       user: {
@@ -176,7 +165,7 @@ exports.loginUser = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error('Error in login:', error);
+    logger.error('Error in login', { error: error.message, stack: error.stack, email: req.body.email });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -192,13 +181,7 @@ exports.logoutUser = (req, res) => {
     path: cookieOptions.path,
   });
   
-  // Debug logging for Safari/Samsung Internet cookie issues
-  console.log('Logout - Cookie cleared:', {
-    origin: req.headers.origin,
-    userAgent: req.headers['user-agent']?.includes('Safari') ? 'Safari' : req.headers['user-agent']?.includes('Samsung') ? 'Samsung' : 'Other',
-    cookieOptions,
-    cookiesReceived: Object.keys(req.cookies || {}),
-  });
+  logger.info('User logged out', { userId: req.user?.id });
   
   res.status(200).json({ message: 'Logged out successfully' });
 };
@@ -207,14 +190,7 @@ exports.getCurrentUser = async (req, res) => {
   try {
     const token = req.cookies.token;
     
-    // Debug logging for Safari/Samsung Internet cookie issues
     if (!token) {
-      console.log('getCurrentUser - No cookie received:', {
-        origin: req.headers.origin,
-        userAgent: req.headers['user-agent']?.includes('Safari') ? 'Safari' : req.headers['user-agent']?.includes('Samsung') ? 'Samsung' : 'Other',
-        cookiesReceived: Object.keys(req.cookies || {}),
-        cookieHeader: req.headers.cookie,
-      });
       return res.status(401).json({ message: 'Not authenticated' });
     }
 
@@ -232,7 +208,7 @@ exports.getCurrentUser = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error('Error in getCurrentUser:', error);
+    logger.error('Error in getCurrentUser', { error: error.message, stack: error.stack });
     res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
@@ -268,7 +244,7 @@ exports.getAllUserData = async (req, res) => {
       chats,
     });
   } catch (error) {
-    console.error('Error fetching all user data:', error);
+    logger.error('Error fetching all user data', { error: error.message, stack: error.stack, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -292,7 +268,7 @@ exports.forgotPassword = async (req, res) => {
     
     // If no user found, return error - user doesn't exist
     if (!user || !user._id || !user.email) {
-      console.log(`Password reset requested for non-existent email: ${normalizedEmail}`);
+      logger.warn('Password reset requested for non-existent email', { email: normalizedEmail });
       return res.status(404).json({ message: 'No account found with this email address' });
     }
 
@@ -316,15 +292,15 @@ exports.forgotPassword = async (req, res) => {
     // Send email to existing user
     try {
       await sendPasswordResetMail(user.email, otp, 'forgot-password');
-      console.log(`Password reset OTP sent to user: ${user.email}`);
+      logger.info('Password reset OTP sent', { email: user.email });
       res.status(200).json({ message: 'OTP sent to your email successfully' });
     } catch (emailError) {
-      console.error('Error sending password reset email:', emailError);
+      logger.error('Error sending password reset email', { error: emailError.message, email: user.email });
       // If email sending fails, return error
       res.status(500).json({ message: 'Failed to send OTP. Please try again later.' });
     }
   } catch (error) {
-    console.error('Error in forgotPassword:', error);
+    logger.error('Error in forgotPassword', { error: error.message, stack: error.stack, email: req.body.email });
     res.status(500).json({ message: 'Server error. Please try again later.' });
   }
 };
@@ -379,7 +355,7 @@ exports.verifyPasswordResetOtp = async (req, res) => {
       email: user.email // Return normalized email for frontend
     });
   } catch (error) {
-    console.error('Error in verifyPasswordResetOtp:', error);
+    logger.error('Error in verifyPasswordResetOtp', { error: error.message, stack: error.stack, email: req.body.email });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -437,9 +413,10 @@ exports.resetPassword = async (req, res) => {
     // Delete the password reset record
     await PasswordReset.deleteOne({ _id: passwordReset._id });
 
+    logger.info('Password reset successfully', { email: user.email });
     res.status(200).json({ message: 'Password reset successfully' });
   } catch (error) {
-    console.error('Error in resetPassword:', error);
+    logger.error('Error in resetPassword', { error: error.message, stack: error.stack, email: req.body.email });
     res.status(500).json({ message: 'Server error' });
   }
 };

@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const logger = require('./logger');
 require('dotenv').config();
 
 const sendOtpMail = async (toEmail, otp) => {
@@ -17,9 +18,9 @@ const sendOtpMail = async (toEmail, otp) => {
       text: `Your OTP code is ${otp}. It is valid for 10 minutes.`,
     };
     await transporter.sendMail(mailOptions);
-    console.log('OTP email sent successfully');
+    logger.info('OTP email sent successfully', { toEmail });
   } catch (error) {
-    console.error('Error sending OTP email:', error);
+    logger.error('Error sending OTP email', { error: error.message, toEmail });
     throw new Error('Could not send OTP email');
   }
 };

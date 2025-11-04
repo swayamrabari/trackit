@@ -1,4 +1,5 @@
 const Chat = require('../models/Chat');
+const logger = require('../utils/logger');
 
 // Get all chat sessions for the authenticated user
 exports.getChatSessions = async (req, res) => {
@@ -9,7 +10,7 @@ exports.getChatSessions = async (req, res) => {
     
     res.status(200).json(sessions);
   } catch (error) {
-    console.error('Error fetching chat sessions:', error);
+    logger.error('Error fetching chat sessions', { error: error.message, stack: error.stack, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -29,7 +30,7 @@ exports.getChatSession = async (req, res) => {
 
     res.status(200).json(session);
   } catch (error) {
-    console.error('Error fetching chat session:', error);
+    logger.error('Error fetching chat session', { error: error.message, stack: error.stack, sessionId: req.params.sessionId, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -47,7 +48,7 @@ exports.createChatSession = async (req, res) => {
 
     res.status(201).json(newSession);
   } catch (error) {
-    console.error('Error creating chat session:', error);
+    logger.error('Error creating chat session', { error: error.message, stack: error.stack, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -84,11 +85,11 @@ exports.updateChatSession = async (req, res) => {
 
     res.status(200).json(session);
   } catch (error) {
-    console.error('Error updating chat session:', error);
+    logger.error('Error updating chat session', { error: error.message, stack: error.stack, sessionId: req.params.sessionId, userId: req.user?._id });
     
     // Handle version errors gracefully (shouldn't happen with atomic update, but just in case)
     if (error.name === 'VersionError') {
-      console.warn('Version conflict detected, retrying with fresh document...');
+      logger.warn('Version conflict detected, retrying with fresh document', { sessionId: req.params.sessionId });
       try {
         // Fallback: fetch fresh document and retry
         const session = await Chat.findOne({
@@ -103,7 +104,7 @@ exports.updateChatSession = async (req, res) => {
         await session.save();
         return res.status(200).json(session);
       } catch (retryError) {
-        console.error('Retry failed:', retryError);
+        logger.error('Retry failed', { error: retryError.message, sessionId: req.params.sessionId });
       }
     }
     
@@ -128,7 +129,7 @@ exports.deleteChatSession = async (req, res) => {
     await Chat.deleteOne({ _id: sessionId });
     res.status(200).json({ message: 'Chat session deleted' });
   } catch (error) {
-    console.error('Error deleting chat session:', error);
+    logger.error('Error deleting chat session', { error: error.message, stack: error.stack, sessionId: req.params.sessionId, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };

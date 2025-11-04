@@ -22,15 +22,8 @@ export const sendMessage = async (
       conversationHistory,
     });
 
-    // Log the raw API response
-    console.log('API Response Data:', response.data);
-    console.log('Response data.response field:', response.data?.response);
-
     return response.data;
   } catch (error: any) {
-    console.error('Error sending message to assistant:', error);
-    console.error('Error response:', error?.response?.data);
-    console.error('Error status:', error?.response?.status);
     
     // Return a more detailed error message
     const errorMessage = error?.response?.data?.message 

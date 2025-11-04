@@ -1,4 +1,5 @@
 const Entry = require('../models/Entries');
+const logger = require('../utils/logger');
 
 // Get all entries for the authenticated user
 exports.getEntries = async (req, res) => {
@@ -8,7 +9,7 @@ exports.getEntries = async (req, res) => {
     
     res.status(200).json(entries);
   } catch (error) {
-    console.error('Error fetching entries:', error);
+    logger.error('Error fetching entries', { error: error.message, stack: error.stack, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -28,7 +29,7 @@ exports.getEntry = async (req, res) => {
 
     res.status(200).json(entry);
   } catch (error) {
-    console.error('Error fetching entry:', error);
+    logger.error('Error fetching entry', { error: error.message, stack: error.stack, entryId: req.params.entryId, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -59,7 +60,7 @@ exports.createEntry = async (req, res) => {
 
     res.status(201).json(newEntry);
   } catch (error) {
-    console.error('Error creating entry:', error);
+    logger.error('Error creating entry', { error: error.message, stack: error.stack, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -92,7 +93,7 @@ exports.updateEntry = async (req, res) => {
     await entry.save();
     res.status(200).json(entry);
   } catch (error) {
-    console.error('Error updating entry:', error);
+    logger.error('Error updating entry', { error: error.message, stack: error.stack, entryId: req.params.entryId, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -114,7 +115,7 @@ exports.deleteEntry = async (req, res) => {
     await Entry.deleteOne({ _id: entryId });
     res.status(200).json({ message: 'Entry deleted' });
   } catch (error) {
-    console.error('Error deleting entry:', error);
+    logger.error('Error deleting entry', { error: error.message, stack: error.stack, entryId: req.params.entryId, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };

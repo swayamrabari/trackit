@@ -4,6 +4,8 @@ const helmet = require('helmet');
 const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
+const logger = require('./utils/logger');
+const requestLogger = require('./middleware/requestLogger');
 const {
   protect,
   errorHandler,
@@ -24,9 +26,7 @@ const optionalEnvVars = [
 
 const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
 if (missingVars.length > 0) {
-  console.error('❌ Missing required environment variables:');
-  missingVars.forEach((varName) => console.error(`   - ${varName}`));
-  console.error('\nPlease set these in your .env file');
+  logger.error('Missing required environment variables:', { missing: missingVars });
   process.exit(1);
 }
 
@@ -35,8 +35,7 @@ const missingOptional = optionalEnvVars.filter(
   (varName) => !process.env[varName]
 );
 if (missingOptional.length > 0 && process.env.NODE_ENV === 'production') {
-  console.warn('⚠️  Missing optional environment variables:');
-  missingOptional.forEach((varName) => console.warn(`   - ${varName}`));
+  logger.warn('Missing optional environment variables:', { missing: missingOptional });
 }
 
 setupProcessErrorHandlers();
@@ -104,12 +103,21 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
+// Request logging middleware (should be after body parsers but before routes)
+app.use(requestLogger);
+
 app.get('/health', (req, res) => {
-  res.status(200).json({
+  const healthData = {
     status: 'ok',
     uptime: process.uptime(),
     timestamp: Date.now(),
+    environment: process.env.NODE_ENV || 'development',
+  };
+  logger.info('Health check', { 
+    uptime: healthData.uptime, 
+    timestamp: healthData.timestamp 
   });
+  res.status(200).json(healthData);
 });
 
 // Routes
@@ -146,11 +154,13 @@ const startServer = async () => {
     await connectDB();
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
-      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info(`Server running on port ${PORT}`, { 
+        port: PORT, 
+        environment: process.env.NODE_ENV || 'development' 
+      });
     });
   } catch (error) {
-    console.error('❌ Failed to start server:', error);
+    logger.error('Failed to start server', { error: error.message, stack: error.stack });
     process.exit(1);
   }
 };

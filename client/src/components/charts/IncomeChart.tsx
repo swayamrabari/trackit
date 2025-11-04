@@ -127,14 +127,10 @@ export function IncomeChart({
           });
         }
 
-        console.log('Chart Data:', acc);
-
         return acc;
       }, [] as { category: string; total: number; fill?: string; percentage?: string }[]),
     [totalIncomeByCategory, totalIncome]
   );
-
-  console.log(chartData);
 
   const chartConfig = useMemo(() => {
     const config: ChartConfig = {};
