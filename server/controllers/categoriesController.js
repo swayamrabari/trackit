@@ -9,14 +9,20 @@ exports.getCategories = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.status(200).json(user.categories || {
-      income: [],
-      expense: [],
-      investment: [],
-      savings: [],
-    });
+    res.status(200).json(
+      user.categories || {
+        income: [],
+        expense: [],
+        investment: [],
+        savings: [],
+      }
+    );
   } catch (error) {
-    logger.error('Error fetching categories', { error: error.message, stack: error.stack, userId: req.user?._id });
+    logger.error('Error fetching categories', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?._id,
+    });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -27,12 +33,14 @@ exports.addCategory = async (req, res) => {
     const { categoryType, category } = req.body;
 
     if (!categoryType || !category) {
-      return res.status(400).json({ 
-        message: 'Category type and category name are required' 
+      return res.status(400).json({
+        message: 'Category type and category name are required',
       });
     }
 
-    if (!['income', 'expense', 'investment', 'savings'].includes(categoryType)) {
+    if (
+      !['income', 'expense', 'investment', 'savings'].includes(categoryType)
+    ) {
       return res.status(400).json({ message: 'Invalid category type' });
     }
 
@@ -62,7 +70,12 @@ exports.addCategory = async (req, res) => {
 
     res.status(200).json(user.categories);
   } catch (error) {
-    logger.error('Error adding category', { error: error.message, stack: error.stack, userId: req.user?._id, categoryType: req.body.categoryType });
+    logger.error('Error adding category', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?._id,
+      categoryType: req.body.categoryType,
+    });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -73,12 +86,14 @@ exports.removeCategory = async (req, res) => {
     const { categoryType, category } = req.body;
 
     if (!categoryType || !category) {
-      return res.status(400).json({ 
-        message: 'Category type and category name are required' 
+      return res.status(400).json({
+        message: 'Category type and category name are required',
       });
     }
 
-    if (!['income', 'expense', 'investment', 'savings'].includes(categoryType)) {
+    if (
+      !['income', 'expense', 'investment', 'savings'].includes(categoryType)
+    ) {
       return res.status(400).json({ message: 'Invalid category type' });
     }
 
@@ -105,7 +120,12 @@ exports.removeCategory = async (req, res) => {
 
     res.status(200).json(user.categories);
   } catch (error) {
-    logger.error('Error removing category', { error: error.message, stack: error.stack, userId: req.user?._id, categoryType: req.body.categoryType });
+    logger.error('Error removing category', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?._id,
+      categoryType: req.body.categoryType,
+    });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -135,8 +155,11 @@ exports.updateCategories = async (req, res) => {
     await user.save();
     res.status(200).json(user.categories);
   } catch (error) {
-    logger.error('Error updating categories', { error: error.message, stack: error.stack, userId: req.user?._id });
+    logger.error('Error updating categories', {
+      error: error.message,
+      stack: error.stack,
+      userId: req.user?._id,
+    });
     res.status(500).json({ message: 'Server error' });
   }
 };
-
