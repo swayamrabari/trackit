@@ -43,14 +43,6 @@ setupProcessErrorHandlers();
 
 const app = express();
 
-app.get('/health', (req, res) => {
-  res.status(200).json({
-    status: 'ok',
-    uptime: process.uptime(),
-    timestamp: Date.now(),
-  });
-});
-
 // Security middleware
 app.use(
   helmet({
@@ -78,6 +70,14 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
+
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+  });
+});
 
 // Routes
 const limiter = rateLimit({
