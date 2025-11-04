@@ -9,6 +9,7 @@ const sendPasswordResetMail = require('../utils/sendPasswordResetMail');
 const generateToken = require('../utils/generateToken');
 
 // Helper function to get cookie options (required for Safari/Samsung Internet compatibility)
+// Safari and Samsung Internet require consistent cookie options with sameSite: 'None' and secure: true in production
 const getCookieOptions = () => {
   // Check if we're in production - use multiple checks for reliability
   const isProduction = 
@@ -16,12 +17,14 @@ const getCookieOptions = () => {
     process.env.RENDER === 'true' || 
     process.env.FORCE_SECURE_COOKIES === 'true';
   
+  // Safari requires sameSite: 'None' and secure: true for cross-origin cookies
+  // These options must be consistent across all cookie operations (set, clear)
   return {
-    httpOnly: true,
-    secure: isProduction, // Must be true when sameSite is 'none' (required for Safari)
-    sameSite: isProduction ? 'none' : 'lax',
+    httpOnly: true, // Prevents JavaScript access (security)
+    secure: isProduction, // Must be true when sameSite is 'none' (Safari requirement)
+    sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-origin in production
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    path: '/', // Explicit path
+    path: '/', // Explicit path ensures cookie is available site-wide
   };
 };
 
@@ -89,7 +92,16 @@ exports.verifyOtp = async (req, res) => {
     const token = generateToken(user);
 
     // Use helper function for consistent cookie options (Safari/Samsung Internet fix)
-    res.cookie('token', token, getCookieOptions());
+    const cookieOptions = getCookieOptions();
+    res.cookie('token', token, cookieOptions);
+
+    // Debug logging for Safari/Samsung Internet cookie issues
+    console.log('OTP Verification - Cookie set:', {
+      origin: req.headers.origin,
+      userAgent: req.headers['user-agent']?.includes('Safari') ? 'Safari' : req.headers['user-agent']?.includes('Samsung') ? 'Samsung' : 'Other',
+      cookieOptions,
+      cookiesReceived: Object.keys(req.cookies || {}),
+    });
 
     res.status(201).json({
       user: {
@@ -144,7 +156,16 @@ exports.loginUser = async (req, res) => {
     const token = generateToken(user);
     
     // Use helper function for consistent cookie options (Safari/Samsung Internet fix)
-    res.cookie('token', token, getCookieOptions());
+    const cookieOptions = getCookieOptions();
+    res.cookie('token', token, cookieOptions);
+
+    // Debug logging for Safari/Samsung Internet cookie issues
+    console.log('Login - Cookie set:', {
+      origin: req.headers.origin,
+      userAgent: req.headers['user-agent']?.includes('Safari') ? 'Safari' : req.headers['user-agent']?.includes('Samsung') ? 'Samsung' : 'Other',
+      cookieOptions,
+      cookiesReceived: Object.keys(req.cookies || {}),
+    });
 
     res.status(200).json({
       user: {
@@ -162,6 +183,7 @@ exports.loginUser = async (req, res) => {
 
 exports.logoutUser = (req, res) => {
   // Clear cookie with same options used to set it (required for Safari/Samsung Internet)
+  // Safari requires exact same options for clearCookie as were used for setCookie
   const cookieOptions = getCookieOptions();
   res.clearCookie('token', {
     httpOnly: cookieOptions.httpOnly,
@@ -169,13 +191,30 @@ exports.logoutUser = (req, res) => {
     sameSite: cookieOptions.sameSite,
     path: cookieOptions.path,
   });
+  
+  // Debug logging for Safari/Samsung Internet cookie issues
+  console.log('Logout - Cookie cleared:', {
+    origin: req.headers.origin,
+    userAgent: req.headers['user-agent']?.includes('Safari') ? 'Safari' : req.headers['user-agent']?.includes('Samsung') ? 'Samsung' : 'Other',
+    cookieOptions,
+    cookiesReceived: Object.keys(req.cookies || {}),
+  });
+  
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
 exports.getCurrentUser = async (req, res) => {
   try {
     const token = req.cookies.token;
+    
+    // Debug logging for Safari/Samsung Internet cookie issues
     if (!token) {
+      console.log('getCurrentUser - No cookie received:', {
+        origin: req.headers.origin,
+        userAgent: req.headers['user-agent']?.includes('Safari') ? 'Safari' : req.headers['user-agent']?.includes('Samsung') ? 'Samsung' : 'Other',
+        cookiesReceived: Object.keys(req.cookies || {}),
+        cookieHeader: req.headers.cookie,
+      });
       return res.status(401).json({ message: 'Not authenticated' });
     }
 
