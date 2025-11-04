@@ -51,19 +51,52 @@ app.use(
   })
 );
 
+// CORS configuration - exact origin match required for Safari/Samsung Internet
+// Safari requires exact domain match (no wildcard) when credentials: true
+const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
-    credentials: true,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (mobile apps, curl, Postman)
+      if (!origin) {
+        return callback(null, true);
+      }
+      // In production, only allow exact CLIENT_URL match (Safari requirement)
+      if (process.env.NODE_ENV === 'production') {
+        if (origin === allowedOrigin) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      } else {
+        // In development, allow localhost and CLIENT_URL
+        if (origin === allowedOrigin || origin.startsWith('http://localhost')) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      }
+    },
+    credentials: true, // Required for cookies to be sent cross-origin
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Set-Cookie'],
   })
 );
 
-// Add Vary header middleware for CORS (required for Safari)
+// Middleware to enforce Access-Control-Allow-Credentials header (required for Safari)
+// This ensures Safari always receives the credentials header even if CORS middleware misses it
 app.use((req, res, next) => {
+  // Set Vary header (required for Safari to properly cache CORS responses)
   res.setHeader('Vary', 'Origin');
+  // Explicitly set credentials header (Safari requires this to be present)
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  // If origin matches, set Access-Control-Allow-Origin (Safari requires exact match)
+  const origin = req.headers.origin;
+  if (origin && (origin === allowedOrigin || (process.env.NODE_ENV !== 'production' && origin.startsWith('http://localhost')))) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
   next();
 });
 
