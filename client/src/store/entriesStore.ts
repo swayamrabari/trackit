@@ -82,7 +82,6 @@ export const useEntriesStore = create<
             const newMainEntries = calculateMainEntries(storeEntries);
             set({ entries: storeEntries, mainEntries: newMainEntries, isLoading: false });
           } catch (error) {
-            console.error('Error loading entries from database:', error);
             set({ isLoading: false });
           }
         },
@@ -114,7 +113,6 @@ export const useEntriesStore = create<
               }));
             }
           } catch (error) {
-            console.error('Error syncing entry to database:', error);
             set({ isSyncing: false });
           }
         },
@@ -149,7 +147,6 @@ export const useEntriesStore = create<
                 )),
               }));
             } catch (error: any) {
-              console.error('Error creating entry in database:', error);
               // Revert on error
               set((state) => {
                 const newEntries = state.entries.filter((e) => e.id !== newEntry.id);
@@ -187,7 +184,6 @@ export const useEntriesStore = create<
             try {
               await entriesApi.deleteEntry(entry._id);
             } catch (error) {
-              console.error('Error deleting entry from database:', error);
               // Revert on error
               set((state) => {
                 const newEntries = [...state.entries, entry].sort((a, b) =>
@@ -236,7 +232,6 @@ export const useEntriesStore = create<
                 )),
               }));
             } catch (error) {
-              console.error('Error updating entry in database:', error);
               // Revert on error
               set((state) => {
                 const newEntries = state.entries.map((e) => (e.id === id ? oldEntry : e));

@@ -123,7 +123,6 @@ export const useBudgetStore = create<BudgetStore>()(
             const storeBudgets = apiBudgets.map(convertApiBudgetToStore);
             set({ budgets: storeBudgets, isLoading: false });
           } catch (error) {
-            console.error('Error loading budgets from database:', error);
             set({ isLoading: false });
           }
         },
@@ -154,13 +153,6 @@ export const useBudgetStore = create<BudgetStore>()(
                 ),
               }));
             } catch (error: any) {
-              console.error('Error creating budget in database:', error);
-              console.error('Error details:', {
-                message: error?.message,
-                response: error?.response?.data,
-                status: error?.response?.status,
-                budget: newBudget
-              });
               // Revert on error
               set((state) => ({
                 budgets: state.budgets.filter((b) => b.id !== newBudget.id),
@@ -189,7 +181,6 @@ export const useBudgetStore = create<BudgetStore>()(
             try {
               await budgetsApi.deleteBudget(budget._id);
             } catch (error) {
-              console.error('Error deleting budget from database:', error);
               // Revert on error
               set((state) => ({
                 budgets: [...state.budgets, budget],
@@ -233,7 +224,6 @@ export const useBudgetStore = create<BudgetStore>()(
                 ),
               }));
             } catch (error) {
-              console.error('Error updating budget in database:', error);
               // Revert on error
               set((state) => ({
                 budgets: state.budgets.map((b) => (b.id === id ? oldBudget : b)),

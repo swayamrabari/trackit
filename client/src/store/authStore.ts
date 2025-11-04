@@ -110,7 +110,7 @@ const loadAllUserData = async () => {
     // Load chats (use existing chat store method)
     useChatStore.getState().loadSessionsFromDatabase();
   } catch (error) {
-    console.error('Error loading all user data:', error);
+    // Error handled silently - UI will show appropriate state
   }
 };
 
@@ -229,9 +229,7 @@ export const useAuthStore = create<AuthState>()(
       checkAuthStatus: async () => {
         try {
           set({ isLoading: true });
-          console.log('Checking auth status...');
           const { user } = await authApi.getCurrentUser();
-          console.log('Auth successful:', user);
           set({
             user,
             isAuthenticated: true,

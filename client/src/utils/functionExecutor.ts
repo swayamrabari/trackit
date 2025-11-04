@@ -1071,7 +1071,6 @@ export async function executeFunction(
         };
 
         try {
-          console.log('[setBudget] Attempting to create budget:', newBudget);
           await useBudgetStore.getState().addBudget(newBudget);
 
           // Verify budget was actually added by checking the store
@@ -1084,14 +1083,12 @@ export async function executeFunction(
           );
 
           if (!createdBudget) {
-            console.warn('[setBudget] Budget not found in store after creation');
             result = {
               success: false,
               message: 'Budget creation may have failed. Please check if the budget was created.',
               error: 'Budget not found in store after creation'
             };
           } else {
-            console.log('[setBudget] Budget successfully created:', createdBudget);
             result = {
               success: true,
               message: `Successfully set ${params.period} budget of ${params.amount} for ${params.category} (${params.type})`,
@@ -1105,7 +1102,6 @@ export async function executeFunction(
           }
         } catch (error: any) {
           // Handle errors from budget creation (e.g., duplicate budgets, network errors)
-          console.error('[setBudget] Error creating budget:', error);
           const errorMessage = error?.message || 'Failed to create budget';
           result = {
             success: false,
@@ -1180,7 +1176,6 @@ export async function executeFunction(
     };
   } catch (error) {
     const executionTime = performance.now() - startTime;
-    console.error(`Error executing function ${functionName}:`, error);
 
     const errorMessage = error instanceof FunctionExecutionError
       ? error.message

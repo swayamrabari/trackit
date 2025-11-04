@@ -911,7 +911,7 @@ function getRelevantFunctions(prompt) {
   }));
 }
 
-console.log(`Number of functions in catalog: ${FUNCTION_CATALOG.length}`);
+// Function catalog initialized with FUNCTION_CATALOG.length functions
 
 module.exports = {
   FUNCTION_CATALOG,

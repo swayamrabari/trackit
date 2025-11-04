@@ -1,4 +1,5 @@
 const Budget = require('../models/Budgets');
+const logger = require('../utils/logger');
 
 // Get all budgets for the authenticated user
 exports.getBudgets = async (req, res) => {
@@ -8,7 +9,7 @@ exports.getBudgets = async (req, res) => {
     
     res.status(200).json(budgets);
   } catch (error) {
-    console.error('Error fetching budgets:', error);
+    logger.error('Error fetching budgets', { error: error.message, stack: error.stack, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -28,7 +29,7 @@ exports.getBudget = async (req, res) => {
 
     res.status(200).json(budget);
   } catch (error) {
-    console.error('Error fetching budget:', error);
+    logger.error('Error fetching budget', { error: error.message, stack: error.stack, budgetId: req.params.budgetId, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -62,7 +63,7 @@ exports.createBudget = async (req, res) => {
 
     res.status(201).json(newBudget);
   } catch (error) {
-    console.error('Error creating budget:', error);
+    logger.error('Error creating budget', { error: error.message, stack: error.stack, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -98,7 +99,7 @@ exports.updateBudget = async (req, res) => {
     await budget.save();
     res.status(200).json(budget);
   } catch (error) {
-    console.error('Error updating budget:', error);
+    logger.error('Error updating budget', { error: error.message, stack: error.stack, budgetId: req.params.budgetId, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -120,7 +121,7 @@ exports.deleteBudget = async (req, res) => {
     await Budget.deleteOne({ _id: budgetId });
     res.status(200).json({ message: 'Budget deleted' });
   } catch (error) {
-    console.error('Error deleting budget:', error);
+    logger.error('Error deleting budget', { error: error.message, stack: error.stack, budgetId: req.params.budgetId, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };

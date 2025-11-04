@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const logger = require('../utils/logger');
 
 // Get user's custom categories
 exports.getCategories = async (req, res) => {
@@ -15,7 +16,7 @@ exports.getCategories = async (req, res) => {
       savings: [],
     });
   } catch (error) {
-    console.error('Error fetching categories:', error);
+    logger.error('Error fetching categories', { error: error.message, stack: error.stack, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -61,7 +62,7 @@ exports.addCategory = async (req, res) => {
 
     res.status(200).json(user.categories);
   } catch (error) {
-    console.error('Error adding category:', error);
+    logger.error('Error adding category', { error: error.message, stack: error.stack, userId: req.user?._id, categoryType: req.body.categoryType });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -104,7 +105,7 @@ exports.removeCategory = async (req, res) => {
 
     res.status(200).json(user.categories);
   } catch (error) {
-    console.error('Error removing category:', error);
+    logger.error('Error removing category', { error: error.message, stack: error.stack, userId: req.user?._id, categoryType: req.body.categoryType });
     res.status(500).json({ message: 'Server error' });
   }
 };
@@ -134,7 +135,7 @@ exports.updateCategories = async (req, res) => {
     await user.save();
     res.status(200).json(user.categories);
   } catch (error) {
-    console.error('Error updating categories:', error);
+    logger.error('Error updating categories', { error: error.message, stack: error.stack, userId: req.user?._id });
     res.status(500).json({ message: 'Server error' });
   }
 };

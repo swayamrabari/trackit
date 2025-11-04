@@ -1,4 +1,5 @@
 const OpenAI = require('openai');
+const logger = require('../utils/logger');
 const {
   FUNCTION_CATALOG,
   validateFunctionParameters,
@@ -41,7 +42,7 @@ async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
           : baseDelay * Math.pow(2, attempt);
         
         const delay = Math.min(retryAfter, 60000); // Cap at 60 seconds
-        console.log(`[Rate Limit] Retrying after ${delay}ms (attempt ${attempt + 1}/${maxRetries})`);
+        logger.warn('Rate limit retry', { delay, attempt: attempt + 1, maxRetries });
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }
@@ -146,8 +147,14 @@ DATA FORMATTING:
       completionOptions.functions = relevantFunctions;
       completionOptions.function_call = 'auto';
       
-      // Log for debugging (optional - can be removed in production)
-      console.log(`[Token Optimization] Using ${relevantFunctions.length}/${FUNCTION_CATALOG.length} functions for: "${prompt.substring(0, 50)}..."`);
+      // Log token optimization in development
+      if (process.env.NODE_ENV !== 'production') {
+        logger.debug('Token optimization', { 
+          functionsUsed: relevantFunctions.length, 
+          totalFunctions: FUNCTION_CATALOG.length,
+          promptPreview: prompt.substring(0, 50)
+        });
+      }
     }
 
     // Wrap OpenAI API call with retry logic for rate limiting
@@ -156,7 +163,7 @@ DATA FORMATTING:
     }, 3, 1000); // 3 retries, starting with 1 second delay
 
     if (!response || !response.choices || !response.choices[0]) {
-      console.error('Unexpected OpenAI response:', response);
+      logger.error('Unexpected OpenAI response', { response });
       return res.status(500).json({ error: 'Invalid response from OpenAI' });
     }
 
@@ -170,14 +177,14 @@ DATA FORMATTING:
       // Validate function parameters
       const validation = validateFunctionParameters(functionName, functionArgs);
       if (!validation.isValid) {
-        console.error('Function validation failed:', validation.errors);
+        logger.error('Function validation failed', { functionName, errors: validation.errors });
         return res.status(400).json({
           error: 'Invalid function parameters',
           details: validation.errors,
         });
       }
 
-      console.log('Function call requested:', functionName, functionArgs);
+      logger.info('Function call requested', { functionName, userId: req.user?._id });
 
       // Return function call request to client
       return res.status(200).json({
@@ -191,8 +198,6 @@ DATA FORMATTING:
     }
 
     // Regular text response
-    console.log('OpenAI Response:', message.content);
-    
     // Ensure we always have a valid response and clean it
     let cleanContent = message.content ? String(message.content).trim() : '';
     
@@ -200,7 +205,7 @@ DATA FORMATTING:
     cleanContent = cleanContent.replace(/\s*undefined\s*$/gi, '').trim();
     
     if (!cleanContent) {
-      console.warn('OpenAI returned empty content');
+      logger.warn('OpenAI returned empty content', { userId: req.user?._id });
       return res.status(200).json({
         type: 'text',
         response: 'I processed your request successfully.',
@@ -210,9 +215,14 @@ DATA FORMATTING:
     return res.status(200).json({
       type: 'text',
       response: cleanContent,
-    });
+      });
   } catch (error) {
-    console.error('Assistant Error:', error);
+    logger.error('Assistant Error', { 
+      error: error.message, 
+      stack: error.stack,
+      userId: req.user?._id,
+      prompt: req.body.prompt?.substring(0, 100)
+    });
     
     // Handle rate limit errors specifically
     if (error.message?.includes('Rate limit') || error.status === 429 || error.response?.status === 429) {
@@ -233,7 +243,7 @@ async function getFunctionCatalog(req, res) {
       count: FUNCTION_CATALOG.length,
     });
   } catch (error) {
-    console.error('Function catalog error:', error);
+    logger.error('Function catalog error', { error: error.message, stack: error.stack });
     res.status(500).json({ error: 'Failed to get function catalog' });
   }
 }

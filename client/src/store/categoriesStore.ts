@@ -82,7 +82,6 @@ export const useCategoriesStore = create<CategoriesStore>()(
           };
           set({ categories: mergedCategories, isLoading: false });
         } catch (error) {
-          console.error('Error loading categories from database:', error);
           set({ isLoading: false });
         }
       },
@@ -109,7 +108,6 @@ export const useCategoriesStore = create<CategoriesStore>()(
           try {
             await categoriesApi.addCategory(categoryType, category);
           } catch (error) {
-            console.error('Error adding category to database:', error);
             // Revert on error
             set((state) => ({
               categories: {
@@ -146,7 +144,6 @@ export const useCategoriesStore = create<CategoriesStore>()(
           try {
             await categoriesApi.removeCategory(categoryType, category);
           } catch (error) {
-            console.error('Error removing category from database:', error);
             // Revert on error
             set((state) => ({
               categories: {
@@ -168,7 +165,6 @@ export const useCategoriesStore = create<CategoriesStore>()(
           try {
             await categoriesApi.updateCategories(categories);
           } catch (error) {
-            console.error('Error updating categories in database:', error);
             // Could revert here if needed
           }
         }
