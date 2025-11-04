@@ -105,7 +105,7 @@ export const useChatStore = create<ChatStore>()(
           const apiSessions = await chatApi.getSessions();
           const storeSessions = apiSessions.map(convertApiSessionToStore);
           set({ sessions: storeSessions, isLoading: false });
-        } catch (error) {
+        } catch {
           set({ isLoading: false });
         }
       },
@@ -157,7 +157,7 @@ export const useChatStore = create<ChatStore>()(
               }));
             }
             set({ isSyncing: false });
-          } catch (error) {
+          } catch {
             set({ isSyncing: false });
           } finally {
             syncTimeouts.delete(sessionId);
@@ -180,7 +180,7 @@ export const useChatStore = create<ChatStore>()(
               currentSessionId: createdStoreSession.id,
             }));
             return createdStoreSession.id;
-          } catch (error) {
+          } catch {
             // Fall through to create local session if DB creation fails
           }
         }
@@ -212,7 +212,7 @@ export const useChatStore = create<ChatStore>()(
         if (isAuthenticated && session?._id) {
           try {
             await chatApi.deleteSession(session._id);
-          } catch (error) {
+          } catch {
             // Error deleting session - continue with local deletion
           }
         }
@@ -250,7 +250,7 @@ export const useChatStore = create<ChatStore>()(
                   ),
                   currentSessionId: createdStoreSession.id,
                 }));
-              }).catch((error) => {
+              }).catch(() => {
                 // Error creating new session - user can manually create one
               });
             }
