@@ -20,6 +20,8 @@ const optionalEnvVars = [
   'OPENAI_API_KEY',
   'EMAIL_USER',
   'EMAIL_PASS',
+  'RESEND_API_KEY',
+  'EMAIL_FROM',
   'GOOGLE_CLIENT_ID',
   'GOOGLE_CLIENT_SECRET',
 ];
