@@ -9,23 +9,19 @@ const sendOtpMail = require('../utils/sendOtpMail');
 const sendPasswordResetMail = require('../utils/sendPasswordResetMail');
 const generateToken = require('../utils/generateToken');
 
-// Helper function to get cookie options (required for Safari/Samsung Internet compatibility)
-// Safari and Samsung Internet require consistent cookie options with sameSite: 'None' and secure: true in production
+// Helper function to get cookie options
 const getCookieOptions = () => {
-  // Check if we're in production - use multiple checks for reliability
   const isProduction = 
     process.env.NODE_ENV === 'production' || 
     process.env.RENDER === 'true' || 
     process.env.FORCE_SECURE_COOKIES === 'true';
   
-  // Safari requires sameSite: 'None' and secure: true for cross-origin cookies
-  // These options must be consistent across all cookie operations (set, clear)
   return {
-    httpOnly: true, // Prevents JavaScript access (security)
-    secure: isProduction, // Must be true when sameSite is 'none' (Safari requirement)
-    sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-origin in production
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    path: '/', // Explicit path ensures cookie is available site-wide
+    path: '/',
   };
 };
 
@@ -92,7 +88,6 @@ exports.verifyOtp = async (req, res) => {
     await PendingUser.deleteOne({ email });
     const token = generateToken(user);
 
-    // Use helper function for consistent cookie options (Safari/Samsung Internet fix)
     const cookieOptions = getCookieOptions();
     res.cookie('token', token, cookieOptions);
 
@@ -150,7 +145,6 @@ exports.loginUser = async (req, res) => {
     }
     const token = generateToken(user);
     
-    // Use helper function for consistent cookie options (Safari/Samsung Internet fix)
     const cookieOptions = getCookieOptions();
     res.cookie('token', token, cookieOptions);
 
@@ -171,8 +165,7 @@ exports.loginUser = async (req, res) => {
 };
 
 exports.logoutUser = (req, res) => {
-  // Clear cookie with same options used to set it (required for Safari/Samsung Internet)
-  // Safari requires exact same options for clearCookie as were used for setCookie
+  // Clear cookie with same options used to set it
   const cookieOptions = getCookieOptions();
   res.clearCookie('token', {
     httpOnly: cookieOptions.httpOnly,

@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, memo, useCallback } from 'react';
 import {
   Table,
   TableBody,
@@ -20,6 +20,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface EntriesTableProps {
   type?: string;
@@ -47,6 +48,145 @@ const hoverBgClasses: Record<string, string> = {
 
 const ITEMS_PER_PAGE = 50;
 
+// Memoized date formatter function
+const formatDate = (date: string | Date): string => {
+  return new Date(date)
+    .toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    })
+    .replace(/(\w{3}) (\d{2})/, '$1, $2');
+};
+
+// Memoized desktop table row component
+const DesktopTableRow = memo(({ 
+  entry, 
+  onEdit, 
+  onDelete 
+}: { 
+  entry: Entry; 
+  onEdit: (entry: Entry) => void;
+  onDelete: (entry: Entry) => void;
+}) => {
+  const formattedDate = useMemo(() => formatDate(entry.date), [entry.date]);
+  const formattedAmount = useMemo(
+    () => entry.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 }),
+    [entry.amount]
+  );
+
+  return (
+    <TableRow
+      className={`hover:${hoverBgClasses[entry.type]}`}
+    >
+      <TableCell>
+        <span
+          className={`capitalize text-${entry.type} bg-${entry.type}/15 px-2 py-1 rounded-md`}
+        >
+          {entry.type}
+        </span>
+      </TableCell>
+      <TableCell className="capitalize">{entry.category}</TableCell>
+      <TableCell>{formattedDate}</TableCell>
+      <TableCell className={`text-right font-bold text-${entry.type}`}>
+        {formattedAmount}
+      </TableCell>
+      <TableCell className="text-right">
+        <div className="flex justify-end gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-foreground hover:bg-transparent"
+            onClick={() => onEdit(entry)}
+            aria-label="Edit Entry"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-expense hover:text-expense hover:bg-transparent"
+            onClick={() => onDelete(entry)}
+            aria-label="Delete Entry"
+          >
+            <Trash className="h-4 w-4" />
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+});
+
+DesktopTableRow.displayName = 'DesktopTableRow';
+
+// Memoized mobile card component
+const MobileEntryCard = memo(({ 
+  entry, 
+  onEdit, 
+  onDelete 
+}: { 
+  entry: Entry; 
+  onEdit: (entry: Entry) => void;
+  onDelete: (entry: Entry) => void;
+}) => {
+  const formattedDate = useMemo(() => formatDate(entry.date), [entry.date]);
+  const formattedAmount = useMemo(
+    () => entry.amount.toLocaleString('en-IN', { minimumFractionDigits: 2 }),
+    [entry.amount]
+  );
+
+  return (
+    <div
+      className={`rounded-xl px-3 py-2.5 ${
+        bgClasses[entry.type] || 'bg-secondary'
+      }/5 border-2 border-${entry.type}/20 hover:${
+        hoverBgClasses[entry.type]
+      } transition-colors`}
+    >
+      {/* Top Row: Category and Actions */}
+      <div className="flex justify-between items-center mb-2">
+        <span
+          className={`text-[12px] font-semibold capitalize ${
+            bgClasses[entry.type] || 'bg-secondary'
+          }/15 text-${entry.type} px-2 py-0.5 rounded-sm`}
+        >
+          {entry.category}
+        </span>
+        <div className="flex gap-0.5">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-foreground hover:bg-transparent"
+            onClick={() => onEdit(entry)}
+            aria-label="Edit Entry"
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-expense hover:text-expense hover:bg-transparent"
+            onClick={() => onDelete(entry)}
+            aria-label="Delete Entry"
+          >
+            <Trash className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+      </div>
+
+      {/* Middle: Amount (Most Prominent) */}
+      <div className="flex items-end justify-between text-[10px] font-semibold">
+        <span className="text-xl font-bold tracking-tight text-foreground">
+          {formattedAmount}
+        </span>
+        <span className="text-foreground/70">{formattedDate}</span>
+      </div>
+    </div>
+  );
+});
+
+MobileEntryCard.displayName = 'MobileEntryCard';
+
 export default function EntriesTable({
   type,
   category,
@@ -58,11 +198,23 @@ export default function EntriesTable({
 }: EntriesTableProps) {
   const { entries, removeEntry } = useEntriesStore();
   const location = useLocation();
+  const isMobile = useIsMobile();
   const [editEntry, setEditEntry] = useState<Entry | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteEntry, setDeleteEntry] = useState<Entry | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Memoize callbacks to prevent unnecessary re-renders
+  const handleEdit = useCallback((entry: Entry) => {
+    setEditEntry(entry);
+    setEditDialogOpen(true);
+  }, []);
+
+  const handleDelete = useCallback((entry: Entry) => {
+    setDeleteEntry(entry);
+    setDeleteDialogOpen(true);
+  }, []);
 
   // Memoize filtered entries for performance
   const filteredEntries = useMemo(() => {
@@ -141,148 +293,42 @@ export default function EntriesTable({
 
   return (
     <div className="w-full overflow-auto">
-      <Table className="font-semibold hidden sm:table">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Type</TableHead>
-            <TableHead>Category</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead className="text-right">Amount</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="font-semibold border-none">
+      {isMobile ? (
+        // Mobile View - Only render cards on mobile
+        <div className="flex flex-col gap-3">
           {displayEntries.map((entry) => (
-            <TableRow
+            <MobileEntryCard
               key={entry.id}
-              className={`hover:${hoverBgClasses[entry.type]}`}
-            >
-              <TableCell>
-                <span
-                  className={`capitalize text-${entry.type} bg-${entry.type}/15 px-2 py-1 rounded-md`}
-                >
-                  {entry.type}
-                </span>
-              </TableCell>
-              <TableCell className="capitalize">{entry.category}</TableCell>
-              <TableCell>
-                {new Date(entry.date)
-                  .toLocaleDateString('en-IN', {
-                    day: '2-digit',
-                    month: 'short',
-                    year: 'numeric',
-                  })
-                  .replace(/(\w{3}) (\d{2})/, '$1, $2')}
-              </TableCell>
-              <TableCell className={`text-right font-bold text-${entry.type}`}>
-                {entry.amount.toLocaleString('en-IN', {
-                  minimumFractionDigits: 2,
-                })}
-              </TableCell>
-              <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-foreground hover:bg-transparent"
-                    onClick={() => {
-                      setEditEntry(entry);
-                      setEditDialogOpen(true);
-                    }}
-                    aria-label="Edit Entry"
-                  >
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-expense hover:text-expense hover:bg-transparent"
-                    onClick={() => {
-                      setDeleteEntry(entry);
-                      setDeleteDialogOpen(true);
-                    }}
-                    aria-label="Delete Entry"
-                  >
-                    <Trash className="h-4 w-4" />
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-      <div className="w-full">
-        {/* Mobile View Card */}
-        <div className="flex flex-col gap-3 sm:hidden">
-          {displayEntries.map((entry) => (
-            <div
-              key={entry.id}
-              className={`rounded-xl px-3 py-2.5 ${
-                bgClasses[entry.type] || 'bg-secondary'
-              }/5 border-2 border-${entry.type}/20 hover:${
-                hoverBgClasses[entry.type]
-              } transition-colors`}
-            >
-              {/* Top Row: Category and Actions */}
-              <div className="flex justify-between items-center mb-2">
-                <span
-                  className={`text-[12px] font-semibold capitalize ${
-                    bgClasses[entry.type] || 'bg-secondary'
-                  }/15 text-${entry.type} px-2 py-0.5 rounded-sm`}
-                >
-                  {entry.category}
-                </span>
-                <div className="flex gap-0.5">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-foreground hover:bg-transparent"
-                    onClick={() => {
-                      setEditEntry(entry);
-                      setEditDialogOpen(true);
-                    }}
-                    aria-label="Edit Entry"
-                  >
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-expense hover:text-expense hover:bg-transparent"
-                    onClick={() => {
-                      setDeleteEntry(entry);
-                      setDeleteDialogOpen(true);
-                    }}
-                    aria-label="Delete Entry"
-                  >
-                    <Trash className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Middle: Amount (Most Prominent) */}
-              <div className="flex items-end justify-between text-[10px] font-semibold">
-                <span
-                  className={`text-xl font-bold tracking-tight text-${entry.type}`}
-                >
-                  {entry.amount.toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}
-                </span>
-                <span className="text-foreground/70">
-                  {new Date(entry.date)
-                    .toLocaleDateString('en-IN', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                    })
-                    .replace(/(\w{3}) (\d{2})/, '$1, $2')}
-                </span>
-              </div>
-            </div>
+              entry={entry}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
-      </div>
+      ) : (
+        // Desktop View - Only render table on desktop
+        <Table className="font-semibold">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Type</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="font-semibold border-none">
+            {displayEntries.map((entry) => (
+              <DesktopTableRow
+                key={entry.id}
+                entry={entry}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      )}
       {location.pathname === '/' && displayEntries.length > 0 && (
         <Link
           to="/entries"

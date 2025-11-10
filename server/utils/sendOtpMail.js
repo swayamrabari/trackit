@@ -3,54 +3,62 @@ require('dotenv').config();
 
 const sendOtpMail = async (toEmail, otp) => {
   try {
-    // Use Resend in production (more reliable for cloud hosting)
-    const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true';
-    
-    if (isProduction && process.env.RESEND_API_KEY) {
-      const { Resend } = require('resend');
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      
-      const { data, error } = await resend.emails.send({
-        from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
-        to: toEmail,
-        subject: 'Your OTP Code',
-        text: `Your OTP code is ${otp}. It is valid for 10 minutes.`,
-      });
-
-      if (error) {
-        throw new Error(error.message || 'Resend API error');
-      }
-
-      logger.info('OTP email sent successfully via Resend', { toEmail });
-      return;
+    // SendGrid is required - check if API key is configured
+    if (!process.env.SENDGRID_API_KEY) {
+      throw new Error('SENDGRID_API_KEY is required but not set. Please configure SendGrid API key in your environment variables.');
     }
 
-    // Fallback to Gmail/nodemailer for development
-    const nodemailer = require('nodemailer');
-    const transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
+    const sgMail = require('@sendgrid/mail');
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    // Use EMAIL_FROM if set, otherwise use default
+    const fromEmail = process.env.EMAIL_FROM || 'trackitwebapp@gmail.com';
+
+    const msg = {
       to: toEmail,
+      from: fromEmail,
       subject: 'Your OTP Code',
       text: `Your OTP code is ${otp}. It is valid for 10 minutes.`,
     };
 
-    await transporter.sendMail(mailOptions);
-    logger.info('OTP email sent successfully via Gmail', { toEmail });
+    await sgMail.send(msg);
+    logger.info('OTP email sent successfully via SendGrid', { toEmail, from: fromEmail });
   } catch (error) {
-    logger.error('Error sending OTP email', { 
-      error: error.message, 
+    // Provide more detailed error information for SendGrid errors
+    const errorDetails = {
+      message: error.message,
+      code: error.code,
+      response: error.response ? {
+        statusCode: error.response.statusCode,
+        body: error.response.body,
+        headers: error.response.headers
+      } : null
+    };
+    
+    logger.error('SendGrid API error', {
+      ...errorDetails,
       toEmail,
-      service: (process.env.NODE_ENV === 'production' || process.env.RENDER === 'true') ? 'Resend' : 'Gmail'
+      from: process.env.EMAIL_FROM || 'trackitwebapp@gmail.com',
+      hint: error.response?.statusCode === 403 
+        ? 'Forbidden error usually means: 1) Sender email not verified in SendGrid, 2) API key lacks Mail Send permissions, or 3) Invalid API key'
+        : error.response?.statusCode === 401
+        ? 'Unauthorized: Invalid API key. Check your SENDGRID_API_KEY environment variable.'
+        : 'Check SendGrid API key permissions and sender email verification'
     });
-    throw new Error('Could not send OTP email');
+    
+    // Create user-friendly error messages
+    let errorMessage = 'Could not send OTP email';
+    if (error.response?.statusCode === 403) {
+      errorMessage = `SendGrid Forbidden: The sender email (${process.env.EMAIL_FROM || 'trackitwebapp@gmail.com'}) must be verified in SendGrid. Check your SendGrid dashboard > Settings > Sender Authentication.`;
+    } else if (error.response?.statusCode === 401) {
+      errorMessage = 'SendGrid Unauthorized: Invalid API key. Check your SENDGRID_API_KEY environment variable.';
+    } else if (error.message.includes('SENDGRID_API_KEY is required')) {
+      errorMessage = error.message;
+    } else {
+      errorMessage = `SendGrid error: ${error.message}`;
+    }
+    
+    throw new Error(errorMessage);
   }
 };
 

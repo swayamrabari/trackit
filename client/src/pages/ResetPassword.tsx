@@ -44,7 +44,9 @@ export default function ResetPassword() {
     }
 
     if (!email) {
-      toast.error('No email found, please try again.', { id: 'reset-password' });
+      toast.error('No email found, please try again.', {
+        id: 'reset-password',
+      });
       navigate('/forgot-password', { replace: true });
       return;
     }
@@ -53,7 +55,9 @@ export default function ResetPassword() {
 
     try {
       await resetPassword(email, password);
-      toast.success('Password reset successfully! Redirecting to login...', { id: 'reset-password' });
+      toast.success('Password reset successfully!', {
+        id: 'reset-password',
+      });
       // Clear state and navigate to login
       setTimeout(() => {
         navigate('/login', { replace: true });
@@ -74,15 +78,13 @@ export default function ResetPassword() {
     <div className="min-h-screen min-w-screen flex flex-col items-center justify-center bg-background">
       <div className="login-container h-fit w-[320px]">
         <img src={logo} alt="TrackIt Logo" className="w-12 mb-5 mx-auto" />
-        <h2 className="text-2xl font-bold mb-0.5 text-center">Reset Password</h2>
+        <h2 className="text-2xl font-bold mb-0.5 text-center">
+          Reset Password
+        </h2>
         <p className="description text-center font-semibold text-muted-foreground mb-2">
           Enter your new password
         </p>
-        {email && (
-          <p className="description text-center text-sm text-muted-foreground mb-6">
-            {email}
-          </p>
-        )}
+
         <form onSubmit={handlePasswordSubmit} className="space-y-4">
           <div>
             <Label htmlFor="password" className="mb-2 block">
@@ -96,7 +98,7 @@ export default function ResetPassword() {
               required
               className="w-full border-2 ring-0"
               disabled={isLoading}
-              placeholder="Enter new password (min 6 characters)"
+              placeholder="Enter new password"
               autoComplete="new-password"
               minLength={6}
             />
@@ -131,7 +133,12 @@ export default function ResetPassword() {
           <Button
             type="submit"
             className="w-full font-semibold"
-            disabled={isLoading || !password || !confirmPassword || password !== confirmPassword}
+            disabled={
+              isLoading ||
+              !password ||
+              !confirmPassword ||
+              password !== confirmPassword
+            }
             variant={'secondary'}
           >
             {isLoading ? 'Resetting...' : 'Reset Password'}
@@ -146,4 +153,3 @@ export default function ResetPassword() {
     </div>
   );
 }
-
