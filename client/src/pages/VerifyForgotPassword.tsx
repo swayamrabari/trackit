@@ -10,7 +10,8 @@ import { toast } from 'sonner';
 
 export default function VerifyForgotPassword() {
   const [otp, setOtp] = useState('');
-  const { verifyPasswordResetOtp, isLoading, error, clearError } = useAuthStore();
+  const { verifyPasswordResetOtp, isLoading, error, clearError } =
+    useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email as string | undefined;
@@ -26,7 +27,7 @@ export default function VerifyForgotPassword() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
-    
+
     if (!email) {
       toast.error('No email found, please try again.', { id: 'verify-otp' });
       navigate('/forgot-password', { replace: true });
@@ -42,7 +43,7 @@ export default function VerifyForgotPassword() {
 
     try {
       await verifyPasswordResetOtp(email, otp);
-      toast.success('OTP verified successfully! Redirecting to reset password...', { id: 'verify-otp' });
+      toast.success('OTP verified successfully!', { id: 'verify-otp' });
       // Navigate to reset password page with email in state
       setTimeout(() => {
         navigate('/reset-password', { state: { email }, replace: true });
@@ -123,4 +124,3 @@ export default function VerifyForgotPassword() {
     </div>
   );
 }
-
