@@ -16,18 +16,12 @@ const getCookieOptions = () => {
     process.env.RENDER === 'true' || 
     process.env.FORCE_SECURE_COOKIES === 'true';
   
-  // For cross-origin requests in production, use 'none' with secure
-  // This allows cookies to work across different domains
-  const sameSite = isProduction ? 'none' : 'lax';
-  
   return {
     httpOnly: true,
-    secure: isProduction, // secure must be true when sameSite is 'none'
-    sameSite: sameSite,
+    secure: isProduction,
+    sameSite: 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
-    // Add domain if needed for cross-subdomain support
-    // domain: process.env.COOKIE_DOMAIN, // e.g., '.yourdomain.com'
   };
 };
 
@@ -189,19 +183,7 @@ exports.logoutUser = (req, res) => {
 
 exports.getCurrentUser = async (req, res) => {
   try {
-    let token;
-
-    // Check for token in cookies first (for cookie-based auth)
-    if (req.cookies.token) {
-      token = req.cookies.token;
-    } 
-    // Check for token in Authorization header (for stateless auth)
-    else if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith('Bearer')
-    ) {
-      token = req.headers.authorization.split(' ')[1];
-    }
+    const token = req.cookies.token;
     
     if (!token) {
       return res.status(401).json({ message: 'Not authenticated' });
@@ -223,12 +205,6 @@ exports.getCurrentUser = async (req, res) => {
     });
   } catch (error) {
     logger.error('Error in getCurrentUser', { error: error.message, stack: error.stack });
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Token expired' });
-    }
-    if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
     res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
