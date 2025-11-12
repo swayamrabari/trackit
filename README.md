@@ -1,5 +1,3 @@
-# TrackIt
-
 <div align="center">
 
 ![TrackIt Logo](client/public/trackit.svg)
