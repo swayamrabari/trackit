@@ -40,7 +40,9 @@ export function ExpenseChart({
   const allEntries = useEntriesStore((state) => state.entries);
 
   const entries = useMemo(() => {
-    let filteredEntries = allEntries.filter((entry) => entry.type === 'expense');
+    let filteredEntries = allEntries.filter(
+      (entry) => entry.type === 'expense'
+    );
 
     if (filterType === 'all') {
       return filteredEntries;
@@ -232,15 +234,15 @@ export function ExpenseChart({
         <Card className="py-4 sm:py-0 md:col-span-2 rounded-xl border-expense/20 bg-expense/5 border-2">
           <CardHeader className="flex flex-col items-stretch px-3.5 py-2.5 sm:flex-row">
             <div className="flex-1 p-4">
-              <CardTitle className="text-lg font-bold">
+              <CardTitle className="text-lg text-foreground font-bold">
                 Expenses Over Time
               </CardTitle>
               <CardDescription className="text-sm font-semibold text-muted-foreground">
                 Track your expense trends over time
                 {totalLineChart > 0
                   ? ` - Total: ${totalLineChart.toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}`
+                      minimumFractionDigits: 2,
+                    })}`
                   : ''}
               </CardDescription>
             </div>

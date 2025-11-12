@@ -236,7 +236,7 @@ export function IncomeChart({
         <Card className="py-4 md:col-span-2 sm:py-0 rounded-xl border-income/20 bg-income/5 border-2">
           <CardHeader className="flex flex-col items-stretch px-3.5 py-2.5 sm:flex-row">
             <div className="flex-1 p-4">
-              <CardTitle className="text-lg font-bold">
+              <CardTitle className="text-lg text-foreground font-bold">
                 Income Over Time
               </CardTitle>
               <CardDescription className="text-sm font-semibold text-muted-foreground">

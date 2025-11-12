@@ -248,7 +248,7 @@ export default function EntriesTableHead({
                 </Select>
                 <div className="pt-3 border-t border-border">
                   <Label className="text-sm font-medium block mb-2">
-                    Time Range
+                    Select Period
                   </Label>
                   <div className="grid grid-cols-3 gap-2">
                     <Button
@@ -257,7 +257,7 @@ export default function EntriesTableHead({
                       }
                       size="sm"
                       onClick={() => setLocalFilterType('all')}
-                      className="w-full"
+                      className="w-full border-[1.5px]"
                     >
                       All
                     </Button>
@@ -271,7 +271,7 @@ export default function EntriesTableHead({
                         setLocalFilterMonth(currentMonth);
                         setLocalFilterYear(currentYear);
                       }}
-                      className="w-full"
+                      className="w-full border-[1.5px]"
                     >
                       Month
                     </Button>
@@ -287,7 +287,7 @@ export default function EntriesTableHead({
                         );
                         setLocalFilterYear(currentYear);
                       }}
-                      className="w-full"
+                      className="w-full border-[1.5px]"
                     >
                       Quarter
                     </Button>
@@ -300,7 +300,7 @@ export default function EntriesTableHead({
                         setLocalFilterType('year');
                         setLocalFilterYear(currentYear);
                       }}
-                      className="w-full"
+                      className="w-full border-[1.5px]"
                     >
                       Year
                     </Button>
@@ -310,7 +310,7 @@ export default function EntriesTableHead({
                       }
                       size="sm"
                       onClick={() => setLocalFilterType('custom')}
-                      className="w-full col-span-2"
+                      className="w-full col-span-2 border-[1.5px]"
                     >
                       Custom
                     </Button>

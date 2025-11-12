@@ -14,7 +14,12 @@ const {
 require('dotenv').config();
 
 // Validate required environment variables
-const requiredEnvVars = ['MONGOURI', 'JWT_SECRET', 'CLIENT_URL', 'SENDGRID_API_KEY'];
+const requiredEnvVars = [
+  'MONGOURI',
+  'JWT_SECRET',
+  'CLIENT_URL',
+  'SENDGRID_API_KEY',
+];
 
 const optionalEnvVars = [
   'OPENAI_API_KEY',
@@ -25,7 +30,9 @@ const optionalEnvVars = [
 
 const missingVars = requiredEnvVars.filter((varName) => !process.env[varName]);
 if (missingVars.length > 0) {
-  logger.error('Missing required environment variables:', { missing: missingVars });
+  logger.error('Missing required environment variables:', {
+    missing: missingVars,
+  });
   process.exit(1);
 }
 
@@ -34,7 +41,9 @@ const missingOptional = optionalEnvVars.filter(
   (varName) => !process.env[varName]
 );
 if (missingOptional.length > 0 && process.env.NODE_ENV === 'production') {
-  logger.warn('Missing optional environment variables:', { missing: missingOptional });
+  logger.warn('Missing optional environment variables:', {
+    missing: missingOptional,
+  });
 }
 
 setupProcessErrorHandlers();
@@ -96,12 +105,15 @@ app.get('/health', (req, res) => {
     timestamp: Date.now(),
     environment: process.env.NODE_ENV || 'development',
   };
-  logger.info('Health check', { 
-    uptime: healthData.uptime, 
-    timestamp: healthData.timestamp 
+  logger.info('Health check', {
+    uptime: healthData.uptime,
+    timestamp: healthData.timestamp,
   });
   res.status(200).json(healthData);
 });
+
+app.use('/api/feedback', require('./routes/feedback'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Routes
 const limiter = rateLimit({
@@ -137,13 +149,16 @@ const startServer = async () => {
     await connectDB();
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
-      logger.info(`Server running on port ${PORT}`, { 
-        port: PORT, 
-        environment: process.env.NODE_ENV || 'development' 
+      logger.info(`Server running on port ${PORT}`, {
+        port: PORT,
+        environment: process.env.NODE_ENV || 'development',
       });
     });
   } catch (error) {
-    logger.error('Failed to start server', { error: error.message, stack: error.stack });
+    logger.error('Failed to start server', {
+      error: error.message,
+      stack: error.stack,
+    });
     process.exit(1);
   }
 };

@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String, select: false },
     googleId: { type: String },
     provider: { type: String, enum: ['local', 'google'], default: 'local' },
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
     categories: {
       income: [{ type: String }],
       expense: [{ type: String }],

@@ -543,7 +543,7 @@ export default function Assistant() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.25 }}
-                    className={`max-w-[85%] md:max-w-[70%] rounded-xl text-sm font-medium md:text-base px-3 py-[7px] leading-6 ${
+                    className={`max-w-[85%] md:max-w-[70%] rounded-xl text-base font-medium md:text-base px-3 py-[7px] leading-6 ${
                       isUser
                         ? 'bg-secondary text-secondary-foreground'
                         : '!px-0 py-0.5'

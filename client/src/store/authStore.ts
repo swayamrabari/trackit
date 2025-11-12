@@ -118,10 +118,12 @@ interface User {
   _id: string;
   name: string;
   email: string;
+  role?: string;
 }
 
 interface AuthState {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -143,6 +145,7 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
+      token: null,
       isAuthenticated: false,
       isLoading: false,
       error: null,
@@ -150,14 +153,15 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         try {
           set({ isLoading: true, error: null });
-          // Backend should set the cookie here
-          const { user } = await authApi.login(email, password);
+          const { user, token } = await authApi.login(email, password);
           set({
             user: {
               _id: user.id,
               name: user.name,
               email: user.email,
+              role: user.role || 'user',
             },
+            token,
             isAuthenticated: true,
             isLoading: false,
           });
@@ -190,14 +194,15 @@ export const useAuthStore = create<AuthState>()(
       verifyOtp: async (email: string, otp: string) => {
         try {
           set({ isLoading: true, error: null });
-          // Backend should set the cookie here
-          const { user } = await authApi.verifyOtp(email, otp);
+          const { user, token } = await authApi.verifyOtp(email, otp);
           set({
             user: {
               _id: user.id,
               name: user.name,
               email: user.email,
+              role: user.role || 'user',
             },
+            token,
             isAuthenticated: true,
             isLoading: false,
           });
@@ -215,12 +220,13 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         try {
-          await authApi.logout(); // Backend should clear the cookie
+          await authApi.logout();
         } catch {
           // Ignore errors on logout
         }
         set({
           user: null,
+          token: null,
           isAuthenticated: false,
           error: null,
         });
@@ -231,7 +237,12 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true });
           const { user } = await authApi.getCurrentUser();
           set({
-            user,
+            user: {
+              _id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role || 'user',
+            },
             isAuthenticated: true,
             isLoading: false,
           });
@@ -241,6 +252,7 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           set({
             user: null,
+            token: null,
             isAuthenticated: false,
             isLoading: false,
           });
@@ -297,9 +309,10 @@ export const useAuthStore = create<AuthState>()(
       name: 'auth-storage',
       partialize: (state) => ({
         user: state.user,
+        token: state.token,
       }),
       onRehydrateStorage: () => (state) => {
-        if (state && state.user) {
+        if (state && state.user && state.token) {
           state.isAuthenticated = true;
         }
       },

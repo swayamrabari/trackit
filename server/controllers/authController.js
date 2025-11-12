@@ -98,6 +98,7 @@ exports.verifyOtp = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role || 'user',
       },
       token,
     });
@@ -155,6 +156,7 @@ exports.loginUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role || 'user',
       },
       token,
     });
@@ -198,6 +200,7 @@ exports.getCurrentUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role || 'user',
       },
     });
   } catch (error) {

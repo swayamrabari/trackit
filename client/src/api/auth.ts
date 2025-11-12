@@ -4,6 +4,7 @@ export interface LoginResponse {
     id: string;
     name: string;
     email: string;
+    role?: string;
   };
   token: string;
 }
@@ -17,6 +18,7 @@ export interface verifyOtpResponse {
     id: string;
     name: string;
     email: string;
+    role?: string;
   };
   token: string;
 }

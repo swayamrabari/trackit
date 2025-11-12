@@ -1,11 +1,17 @@
 import { NavLink } from 'react-router-dom';
 import React from 'react';
 import navOptions from '../constants/navOtions';
+import { useAuthStore } from '@/store/authStore';
 
 function MobileNavbar() {
+  const user = useAuthStore((s) => s.user);
+  const filteredNavOptions = navOptions.filter(
+    (option) => !option.adminOnly || user?.role === 'admin'
+  );
+
   return (
     <nav className="sticky bottom-0 z-30 grid grid-cols-5 gap-0 sm:hidden w-full py-6 bg-background border-t border-border px-5 ">
-      {navOptions.map((option) => (
+      {filteredNavOptions.map((option) => (
         <NavLink
           key={option.label}
           to={option.path}

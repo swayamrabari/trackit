@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Select,
   SelectTrigger,
@@ -6,6 +6,7 @@ import {
   SelectItem,
   SelectGroup,
   SelectValue,
+  SelectSeparator,
 } from './ui/select';
 import {
   Dialog,
@@ -18,7 +19,7 @@ import {
 } from './ui/dialog';
 import { Button } from './ui/button';
 import { CalendarIcon, Plus } from 'lucide-react';
-import AddEntryIcon from '../assets/addentey.svg';
+// AddEntryIcon is now inlined below
 import { useCategoriesStore } from '@/store/categoriesStore';
 import { Input } from './ui/input';
 import { format } from 'date-fns';
@@ -39,6 +40,9 @@ export default function AddEntry({ inSidebar = false }) {
   const [category, setCategory] = useState('');
   const [amount, setAmount] = useState<number>(0);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const [isAddingNewCategory, setIsAddingNewCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
+  const newCategoryInputRef = useRef<HTMLInputElement>(null);
 
   const isEligible = type && category && amount > 0 && date;
 
@@ -50,17 +54,86 @@ export default function AddEntry({ inSidebar = false }) {
       type as keyof typeof categoriesStore.categories
     ] || [];
 
+  // Focus input when entering add new category mode
+  useEffect(() => {
+    if (isAddingNewCategory && newCategoryInputRef.current) {
+      newCategoryInputRef.current.focus();
+    }
+  }, [isAddingNewCategory]);
+
+  const handleCategoryChange = (value: string) => {
+    if (value === '__add_new__') {
+      setIsAddingNewCategory(true);
+      setCategory('');
+    } else {
+      setIsAddingNewCategory(false);
+      setCategory(value);
+      setNewCategoryName('');
+    }
+  };
+
+  const handleAddNewCategory = async () => {
+    const trimmedName = newCategoryName.trim();
+    
+    // Validation: Check for empty values
+    if (!trimmedName) {
+      return; // Don't proceed if empty
+    }
+    
+    if (!type) {
+      return; // Don't proceed if no type selected
+    }
+
+    const categoryName = trimmedName.toLowerCase();
+    
+    // Check if category already exists
+    if (relevantCategories.includes(categoryName)) {
+      setCategory(categoryName);
+      setIsAddingNewCategory(false);
+      setNewCategoryName('');
+      return;
+    }
+
+    // Add category to store
+    await categoriesStore.addCategory(
+      type as keyof typeof categoriesStore.categories,
+      categoryName
+    );
+
+    // Select the newly created category
+    setCategory(categoryName);
+    setIsAddingNewCategory(false);
+    setNewCategoryName('');
+  };
+
+  const handleNewCategoryKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddNewCategory();
+    } else if (e.key === 'Escape') {
+      setIsAddingNewCategory(false);
+      setNewCategoryName('');
+      setCategory('');
+    }
+  };
+
   return (
     <>
-      <Dialog>
+      <Dialog
+        onOpenChange={(open) => {
+          if (!open) {
+            setIsAddingNewCategory(false);
+            setNewCategoryName('');
+          }
+        }}
+      >
         {inSidebar ? (
           <DialogTrigger asChild>
-            <div className="transition-all font-medium w-full flex gap-2 hover:bg-secondary cursor-pointer items-center justify-start px-2.5 py-2 rounded-md">
-              <img
-                src={AddEntryIcon}
-                alt="Add Entry"
-                className="h-[20px] w-[25px]"
-              />
+            <div className="transition-all font-medium w-full flex gap-2 hover:bg-secondary cursor-pointer items-center justify-start px-2.5 py-2 rounded-md text-foreground">
+              <svg width="22" height="23" viewBox="0 0 22 23" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-[20px] w-[22px]">
+                <path d="M4.29297 10.293C4.68349 9.90245 5.31651 9.90245 5.70703 10.293C6.09752 10.6835 6.09754 11.3165 5.70703 11.707L3.41406 14H9.6748C9.37938 14.6218 9.1733 15.2938 9.07227 16H3.41406L5.70703 18.293C6.09752 18.6835 6.09754 19.3165 5.70703 19.707C5.31652 20.0975 4.68348 20.0975 4.29297 19.707L0.292969 15.707C-0.097543 15.3165 -0.0975178 14.6835 0.292969 14.293L4.29297 10.293ZM12.293 0.29297C12.6835 -0.0975548 13.3165 -0.0975548 13.707 0.29297L17.707 4.29297C18.0975 4.6835 18.0975 5.31652 17.707 5.70703L13.707 9.70703C13.3165 10.0975 12.6835 10.0975 12.293 9.70703C11.9025 9.31652 11.9025 8.6835 12.293 8.29297L14.5859 6H1C0.44774 6 4.08113e-05 5.55225 0 5C0 4.44772 0.447715 4 1 4H14.5859L12.293 1.70703C11.9025 1.31652 11.9025 0.683497 12.293 0.29297Z" fill="currentColor"/>
+                <path d="M14 17H18M16 15V19M21 17C21 19.7614 18.7614 22 16 22C13.2386 22 11 19.7614 11 17C11 14.2386 13.2386 12 16 12C18.7614 12 21 14.2386 21 17Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
               <span className="text-base">Add Entry</span>
             </div>
           </DialogTrigger>
@@ -90,6 +163,8 @@ export default function AddEntry({ inSidebar = false }) {
             onValueChange={(value) => {
               setType(value);
               setCategory('');
+              setIsAddingNewCategory(false);
+              setNewCategoryName('');
             }}
             className="grid grid-cols-2 grid-rows-2 gap-2 font-semibold"
             value={type}
@@ -111,34 +186,78 @@ export default function AddEntry({ inSidebar = false }) {
           </RadioGroup>
 
           <Label className="mt-3">Select Category</Label>
-          <Select
-            key={type}
-            disabled={!type}
-            onValueChange={(value) => setCategory(value)}
-          >
-            <SelectTrigger
+          {!isAddingNewCategory ? (
+            <Select
+              key={type}
               disabled={!type}
-              className="bg-secondary border-none capitalize"
+              value={category}
+              onValueChange={handleCategoryChange}
             >
-              <SelectValue
-                placeholder="Select Category"
-                className="w-full text-left"
-              />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                {relevantCategories.map((category: string) => (
+              <SelectTrigger
+                disabled={!type}
+                className="bg-secondary border-none capitalize"
+              >
+                <SelectValue
+                  placeholder="Select Category"
+                  className="w-full text-left"
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
                   <SelectItem
-                    key={category}
-                    value={category}
-                    className="capitalize"
+                    value="__add_new__"
+                    className="text-primary font-semibold"
                   >
-                    {category}
+                    <Plus className="inline h-4 w-4 mr-2" />
+                    Add New Category
                   </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+                  <SelectSeparator />
+                  {relevantCategories.map((cat: string) => (
+                    <SelectItem
+                      key={cat}
+                      value={cat}
+                      className="capitalize"
+                    >
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              <Input
+                ref={newCategoryInputRef}
+                placeholder="Enter category name"
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                onKeyDown={handleNewCategoryKeyDown}
+                className="col-span-2 capitalize text-sm font-semibold"
+                autoFocus
+              />
+              <Button
+                type="button"
+                onClick={handleAddNewCategory}
+                disabled={!newCategoryName.trim() || !type}
+                variant="secondary"
+                className="text-sm font-semibold"
+              >
+                Add
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  setIsAddingNewCategory(false);
+                  setNewCategoryName('');
+                  setCategory('');
+                }}
+                variant="outline"
+                className="text-sm font-semibold"
+              >
+                Cancel
+              </Button>
+            </div>
+          )}
           <Label className="mt-3">Select Date</Label>
           <Popover
             modal={true}
@@ -184,6 +303,8 @@ export default function AddEntry({ inSidebar = false }) {
                 setCategory('');
                 setAmount(0);
                 setDate(undefined);
+                setIsAddingNewCategory(false);
+                setNewCategoryName('');
               }}
             >
               Add Entry

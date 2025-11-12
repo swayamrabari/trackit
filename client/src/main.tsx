@@ -1,10 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { Toaster } from 'sonner';
 import './index.css';
 import App from './App.tsx';
 import BrowserCompatibilityCheck from './components/BrowserCompatibilityCheck.tsx';
+import { ThemeToaster } from './components/ThemeToaster.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -12,7 +12,7 @@ createRoot(document.getElementById('root')!).render(
       <Router>
         <App />
       </Router>
-      <Toaster theme="dark" richColors position="top-center" />
+      <ThemeToaster />
     </BrowserCompatibilityCheck>
   </StrictMode>
 );

@@ -10,4 +10,27 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Add request interceptor to include token in Authorization header
+api.interceptors.request.use(
+  (config) => {
+    // Get token from localStorage (stored by authStore)
+    const authStorage = localStorage.getItem('auth-storage');
+    if (authStorage) {
+      try {
+        const parsed = JSON.parse(authStorage);
+        const token = parsed.state?.token;
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        // Ignore parse errors
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export default api;

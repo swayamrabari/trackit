@@ -10,12 +10,15 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { EllipsisVertical, LogOut } from 'lucide-react';
+import { EllipsisVertical, LogOut, Moon, Sun } from 'lucide-react';
 import { CategoryDialog } from './CategoryDialog';
+import { FeedbackDialog } from './FeedbackDialog';
+import { useTheme } from '@/hooks/use-theme';
 
 export default function SidebarNav() {
   const addBudget = useBudgetStore((s) => s.addBudget);
   const user = useAuthStore((s) => s.user);
+  const { theme, toggleTheme } = useTheme();
   return (
     <aside className="hidden tracking-normal lg:flex flex-col h-svh w-64 bg-sidebar border-r border-border top-0">
       <div className="px-6 py-7 flex items-center gap-3">
@@ -30,22 +33,24 @@ export default function SidebarNav() {
           Workspace
         </span>
         <nav className="flex flex-col w-full overflow-y px-2.5 py-1">
-          {navOptions.map((option) => (
-            <NavLink
-              key={option.label}
-              to={option.path}
-              className={({ isActive }) =>
-                `transition-all font-semibold w-full flex gap-2 items-center px-2.5 py-2 rounded-md ${
-                  isActive ? 'bg-secondary' : ''
-                }`
-              }
-            >
-              {React.cloneElement(option.icon, {
-                className: 'h-[20px]',
-              })}
-              <span className="text-base font-medium">{option.label}</span>
-            </NavLink>
-          ))}
+          {navOptions
+            .filter((option) => !option.adminOnly || user?.role === 'admin')
+            .map((option) => (
+              <NavLink
+                key={option.label}
+                to={option.path}
+                className={({ isActive }) =>
+                  `transition-all font-semibold w-full flex gap-2 items-center px-2.5 py-2 rounded-md ${
+                    isActive ? 'bg-secondary' : ''
+                  }`
+                }
+              >
+                {React.cloneElement(option.icon, {
+                  className: 'h-[20px]',
+                })}
+                <span className="text-base font-medium">{option.label}</span>
+              </NavLink>
+            ))}
         </nav>
       </div>
       <div className="actions mt-2">
@@ -69,6 +74,18 @@ export default function SidebarNav() {
               </PopoverTrigger>
               <PopoverContent className="w-40 p-1.5 rounded-xl">
                 <div className="flex flex-col gap-1.5">
+                  <FeedbackDialog />
+                  <div
+                    className="flex text-foreground font-semibold text-sm gap-2 items-center cursor-pointer bg-secondary hover:bg-secondary/80 transition-all rounded-md p-2"
+                    onClick={toggleTheme}
+                  >
+                    {theme === 'dark' ? (
+                      <Sun className="inline h-5 w-5" />
+                    ) : (
+                      <Moon className="inline h-5 w-5" />
+                    )}
+                    <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                  </div>
                   <div
                     className="flex text-expense font-semibold text-sm gap-2 items-center cursor-pointer bg-expense/15 hover:bg-expense/10 transition-all rounded-md p-2"
                     onClick={() => useAuthStore.getState().logout()}

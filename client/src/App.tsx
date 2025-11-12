@@ -19,12 +19,14 @@ import Budget from './pages/Budget';
 import Entries from './pages/Entries';
 import Insights from './pages/Insights';
 import Assistant from './pages/Assistant';
+import Admin from './pages/Admin';
 
 // Components
 import Navbar from './components/Navbar';
 import MobileNavbar from './components/MobileNavbar';
 import SidebarNav from './components/SidebarNav';
 import { Protected } from './components/Protected';
+import { AdminProtected } from './components/AdminProtected';
 
 // Page transition animations
 const pageVariants = {
@@ -123,6 +125,16 @@ function AppLayout() {
                     </PageWrapper>
                   }
                 />
+                <Route element={<AdminProtected />}>
+                  <Route
+                    path="/admin"
+                    element={
+                      <PageWrapper>
+                        <Admin />
+                      </PageWrapper>
+                    }
+                  />
+                </Route>
                 {/* Catch-all */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
@@ -220,6 +232,9 @@ function App() {
             <Route path="/entries" element={<Entries />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/assistant" element={<Assistant />} />
+            <Route element={<AdminProtected />}>
+              <Route path="/admin" element={<Admin />} />
+            </Route>
           </Route>
         </Route>
 
