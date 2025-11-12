@@ -7,10 +7,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { LogOut } from 'lucide-react';
+import { LogOut, Moon, Sun } from 'lucide-react';
+import { useTheme } from '@/hooks/use-theme';
 
 export default function Navbar() {
   const user = useAuthStore((s) => s.user);
+  const { theme, toggleTheme } = useTheme();
   return (
     <>
       <header className="sticky lg:hidden top-0 w-screen border-b flex items-center justify-center border-border bg-background z-30">
@@ -46,6 +48,17 @@ export default function Navbar() {
             </PopoverTrigger>
             <PopoverContent className="w-40 p-1.5 rounded-xl" align="end">
               <div className="flex flex-col gap-1.5">
+                <div
+                  className="flex text-foreground font-semibold text-sm gap-2 items-center cursor-pointer bg-secondary hover:bg-secondary/80 transition-all rounded-md p-2"
+                  onClick={toggleTheme}
+                >
+                  {theme === 'dark' ? (
+                    <Sun className="inline h-5 w-5" />
+                  ) : (
+                    <Moon className="inline h-5 w-5" />
+                  )}
+                  <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                </div>
                 <div
                   className="flex text-expense font-semibold text-sm gap-2 items-center cursor-pointer bg-expense/15 hover:bg-expense/10 transition-all rounded-md p-2"
                   onClick={() => useAuthStore.getState().logout()}

@@ -4,6 +4,7 @@ import {
   WalletCards,
   ArrowLeftRight,
   Sparkles,
+  Shield,
 } from 'lucide-react';
 
 const navOptions = [
@@ -16,6 +17,7 @@ const navOptions = [
   { path: '/insights', icon: <ChartPie />, label: 'Insights' },
   { path: '/budget', icon: <WalletCards />, label: 'Budgets' },
   { path: '/assistant', icon: <Sparkles />, label: 'TrackIt AI' },
+  { path: '/admin', icon: <Shield />, label: 'Admin', adminOnly: true },
 ];
 
 export default navOptions;

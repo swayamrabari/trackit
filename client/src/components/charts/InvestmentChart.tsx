@@ -40,7 +40,9 @@ export function InvestmentChart({
   const allEntries = useEntriesStore((state) => state.entries);
 
   const entries = useMemo(() => {
-    let filteredEntries = allEntries.filter((entry) => entry.type === 'investment');
+    let filteredEntries = allEntries.filter(
+      (entry) => entry.type === 'investment'
+    );
 
     if (filterType === 'all') {
       return filteredEntries;
@@ -232,15 +234,15 @@ export function InvestmentChart({
         <Card className="py-4 md:col-span-2 sm:py-0 rounded-xl border-investment/20 bg-investment/5 border-2">
           <CardHeader className="flex flex-col items-stretch px-3.5 py-2.5 sm:flex-row">
             <div className="flex-1 p-4">
-              <CardTitle className="text-lg font-bold">
+              <CardTitle className="text-lg text-foreground font-bold">
                 Investment Over Time
               </CardTitle>
               <CardDescription className="text-sm font-semibold text-muted-foreground">
                 Track your investment trends over time
                 {totalLineChart > 0
                   ? ` - Total: ${totalLineChart.toLocaleString('en-IN', {
-                    minimumFractionDigits: 2,
-                  })}`
+                      minimumFractionDigits: 2,
+                    })}`
                   : ''}
               </CardDescription>
             </div>

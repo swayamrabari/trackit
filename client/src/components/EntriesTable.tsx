@@ -20,7 +20,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface EntriesTableProps {
   type?: string;
@@ -198,7 +197,6 @@ export default function EntriesTable({
 }: EntriesTableProps) {
   const { entries, removeEntry } = useEntriesStore();
   const location = useLocation();
-  const isMobile = useIsMobile();
   const [editEntry, setEditEntry] = useState<Entry | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteEntry, setDeleteEntry] = useState<Entry | null>(null);
@@ -293,42 +291,40 @@ export default function EntriesTable({
 
   return (
     <div className="w-full overflow-auto">
-      {isMobile ? (
-        // Mobile View - Only render cards on mobile
-        <div className="flex flex-col gap-3">
+      {/* Mobile View - Hidden on desktop (md and above) */}
+      <div className="flex flex-col gap-3 md:hidden">
+        {displayEntries.map((entry) => (
+          <MobileEntryCard
+            key={entry.id}
+            entry={entry}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+          />
+        ))}
+      </div>
+      
+      {/* Desktop View - Hidden on mobile, shown on desktop (md and above) */}
+      <Table className="font-semibold hidden md:table">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Type</TableHead>
+            <TableHead>Category</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead className="text-right">Amount</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className="font-semibold border-none">
           {displayEntries.map((entry) => (
-            <MobileEntryCard
+            <DesktopTableRow
               key={entry.id}
               entry={entry}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />
           ))}
-        </div>
-      ) : (
-        // Desktop View - Only render table on desktop
-        <Table className="font-semibold">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Type</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody className="font-semibold border-none">
-            {displayEntries.map((entry) => (
-              <DesktopTableRow
-                key={entry.id}
-                entry={entry}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-              />
-            ))}
-          </TableBody>
-        </Table>
-      )}
+        </TableBody>
+      </Table>
       {location.pathname === '/' && displayEntries.length > 0 && (
         <Link
           to="/entries"
