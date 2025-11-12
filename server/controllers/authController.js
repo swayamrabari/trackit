@@ -16,10 +16,21 @@ const getCookieOptions = () => {
     process.env.RENDER === 'true' || 
     process.env.FORCE_SECURE_COOKIES === 'true';
   
+  // Check if client and server are on different domains
+  // If CLIENT_URL is set and not localhost, we need cross-domain cookie settings
+  const clientUrl = process.env.CLIENT_URL || '';
+  const isCrossDomain = clientUrl && 
+    !clientUrl.startsWith('http://localhost') && 
+    !clientUrl.startsWith('http://127.0.0.1');
+  
+  // For cross-domain cookies, we MUST use sameSite: 'none' and secure: true
+  // sameSite: 'none' requires secure: true (browser requirement)
+  const useCrossDomainCookies = isProduction && isCrossDomain;
+  
   return {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: 'lax',
+    secure: useCrossDomainCookies || isProduction, // Must be true when sameSite is 'none'
+    sameSite: useCrossDomainCookies ? 'none' : 'lax',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     path: '/',
   };
