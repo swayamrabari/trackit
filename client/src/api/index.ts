@@ -24,11 +24,33 @@ api.interceptors.request.use(
         }
       } catch (error) {
         // Ignore parse errors
+        console.warn('Failed to parse auth storage:', error);
       }
     }
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to handle auth errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // If token is invalid or expired, clear auth state
+    if (error.response?.status === 401) {
+      // Only clear auth if it's not a login/register endpoint
+      const url = error.config?.url || '';
+      if (!url.includes('/auth/login') && !url.includes('/auth/register') && !url.includes('/auth/verify-otp')) {
+        // Clear auth storage
+        localStorage.removeItem('auth-storage');
+        // Redirect to login if not already there
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/register') {
+          window.location.href = '/login';
+        }
+      }
+    }
     return Promise.reject(error);
   }
 );
