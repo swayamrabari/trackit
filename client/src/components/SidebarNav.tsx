@@ -19,6 +19,9 @@ export default function SidebarNav() {
   const addBudget = useBudgetStore((s) => s.addBudget);
   const user = useAuthStore((s) => s.user);
   const { theme, toggleTheme } = useTheme();
+  const filteredNavOptions = navOptions.filter((option) =>
+    user?.role === 'admin' ? option.adminOnly : !option.adminOnly
+  );
   return (
     <aside className="hidden tracking-normal lg:flex flex-col h-svh w-64 bg-sidebar border-r border-border top-0">
       <div className="px-6 py-7 flex items-center gap-3">
@@ -33,37 +36,37 @@ export default function SidebarNav() {
           Workspace
         </span>
         <nav className="flex flex-col w-full overflow-y px-2.5 py-1">
-          {navOptions
-            .filter((option) => !option.adminOnly || user?.role === 'admin')
-            .map((option) => (
-              <NavLink
-                key={option.label}
-                to={option.path}
-                className={({ isActive }) =>
-                  `transition-all font-semibold w-full flex gap-2 items-center px-2.5 py-2 rounded-md ${
-                    isActive ? 'bg-secondary' : ''
-                  }`
-                }
-              >
-                {React.cloneElement(option.icon, {
-                  className: 'h-[20px]',
-                })}
-                <span className="text-base font-medium">{option.label}</span>
-              </NavLink>
-            ))}
+          {filteredNavOptions.map((option) => (
+            <NavLink
+              key={option.label}
+              to={option.path}
+              className={({ isActive }) =>
+                `transition-all font-semibold w-full flex gap-2 items-center px-2.5 py-2 rounded-md ${
+                  isActive ? 'bg-secondary' : ''
+                }`
+              }
+            >
+              {React.cloneElement(option.icon, {
+                className: 'h-[20px]',
+              })}
+              <span className="text-base font-medium">{option.label}</span>
+            </NavLink>
+          ))}
         </nav>
       </div>
-      <div className="actions mt-2">
-        <span className="px-6 text-xs tracking-wide font-semibold text-muted-foreground">
-          Actions
-        </span>
-        {/* display here add entry and budget dialogue triggers */}
-        <div className="px-2.5 py-1 flex flex-col select-none">
-          <AddEntry inSidebar />
-          <AddBudgetDialog onAdd={addBudget} inSidebar />
-          <CategoryDialog />
+      {user?.role !== 'admin' && (
+        <div className="actions mt-2">
+          <span className="px-6 text-xs tracking-wide font-semibold text-muted-foreground">
+            Actions
+          </span>
+          {/* display here add entry and budget dialogue triggers */}
+          <div className="px-2.5 py-1 flex flex-col select-none">
+            <AddEntry inSidebar />
+            <AddBudgetDialog onAdd={addBudget} inSidebar />
+            <CategoryDialog />
+          </div>
         </div>
-      </div>
+      )}
       {/* Avatar */}
       <div className="mt-auto profile-card p-3">
         <div className="relative overflow-hidden group flex items-center gap-3 p-3 bg-secondary rounded-lg">

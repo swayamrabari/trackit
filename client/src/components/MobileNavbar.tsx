@@ -5,8 +5,8 @@ import { useAuthStore } from '@/store/authStore';
 
 function MobileNavbar() {
   const user = useAuthStore((s) => s.user);
-  const filteredNavOptions = navOptions.filter(
-    (option) => !option.adminOnly || user?.role === 'admin'
+  const filteredNavOptions = navOptions.filter((option) =>
+    user?.role === 'admin' ? option.adminOnly : !option.adminOnly
   );
 
   return (
