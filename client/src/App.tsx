@@ -65,13 +65,13 @@ const PageWrapper = ({ children }: { children: ReactNode }) => (
 // Layout for protected pages
 function AppLayout() {
   const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   return (
     <div className="flex h-screen w-screen overflow-hidden">
-      <SidebarNav />
-
+      {!isAdminPage && <SidebarNav />}
       <div className="flex flex-col flex-1 w-full min-w-0">
-        <Navbar />
+        <Navbar hideNavOptions={isAdminPage} forceVisible={isAdminPage} />
         <div className="page px-5 w-full md:px-12 flex-1 overflow-y-auto">
           <div className="max-w-[1000px] mx-auto w-full">
             <AnimatePresence
@@ -141,7 +141,7 @@ function AppLayout() {
             </AnimatePresence>
           </div>
         </div>
-        <MobileNavbar />
+        {!isAdminPage && <MobileNavbar />}
       </div>
     </div>
   );
@@ -149,8 +149,13 @@ function AppLayout() {
 
 // PublicRoute: redirect if user already logged in
 function PublicRoute({ children }: { children: JSX.Element }) {
-  const { isAuthenticated } = useAuthStore();
-  return isAuthenticated ? <Navigate to="/" replace /> : children;
+  const { isAuthenticated, user } = useAuthStore();
+
+  if (!isAuthenticated) {
+    return children;
+  }
+
+  return <Navigate to={user?.role === 'admin' ? '/admin' : '/'} replace />;
 }
 
 // Main App component

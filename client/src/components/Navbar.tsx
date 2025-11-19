@@ -10,33 +10,47 @@ import {
 import { LogOut, Moon, Sun } from 'lucide-react';
 import { useTheme } from '@/hooks/use-theme';
 
-export default function Navbar() {
+interface NavbarProps {
+  hideNavOptions?: boolean;
+  forceVisible?: boolean;
+}
+
+export default function Navbar({ hideNavOptions, forceVisible }: NavbarProps) {
   const user = useAuthStore((s) => s.user);
   const { theme, toggleTheme } = useTheme();
+  const filteredNavOptions = navOptions.filter((option) =>
+    user?.role === 'admin' ? option.adminOnly : !option.adminOnly
+  );
   return (
     <>
-      <header className="sticky lg:hidden top-0 w-screen border-b flex items-center justify-center border-border bg-background z-30">
+      <header
+        className={`sticky top-0 w-screen border-b flex items-center justify-center border-border bg-background z-30 ${
+          forceVisible ? '' : 'lg:hidden'
+        }`}
+      >
         <div className="max-w-[1000px] w-full flex items-center justify-between py-5 px-5 lg:px-0">
           <img src="/trackit.svg" alt="Trackit Logo" className="h-8" />
           {/* Navigation */}
-          <nav className="hidden items-center gap-3 sm:flex">
-            {navOptions.map((option) => (
-              <NavLink
-                key={option.label}
-                to={option.path}
-                className={({ isActive }) =>
-                  `transition-all font-semibold items-center gap-2 flex px-4 py-2 rounded-md ${
-                    isActive ? 'text-foreground' : 'text-muted-foreground'
-                  }`
-                }
-              >
-                {React.cloneElement(option.icon, {
-                  className: 'h-5 w-5 stroke-[2.2px]',
-                })}
-                <span>{option.label}</span>
-              </NavLink>
-            ))}
-          </nav>
+          {!hideNavOptions && (
+            <nav className="hidden items-center gap-3 sm:flex">
+              {filteredNavOptions.map((option) => (
+                <NavLink
+                  key={option.label}
+                  to={option.path}
+                  className={({ isActive }) =>
+                    `transition-all font-semibold items-center gap-2 flex px-4 py-2 rounded-md ${
+                      isActive ? 'text-foreground' : 'text-muted-foreground'
+                    }`
+                  }
+                >
+                  {React.cloneElement(option.icon, {
+                    className: 'h-5 w-5 stroke-[2.2px]',
+                  })}
+                  <span>{option.label}</span>
+                </NavLink>
+              ))}
+            </nav>
+          )}
           {/* Avatar + Account actions */}
           <Popover>
             <PopoverTrigger className="avatar h-10 w-10 bg-muted/50 rounded-full flex items-center justify-center">
