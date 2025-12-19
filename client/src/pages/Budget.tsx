@@ -276,7 +276,7 @@ export default function BudgetPage() {
         </div>
 
         {/* Tabbed interface for transaction types */}
-        <div className="w-full mb-6 md:mb-10">
+        <div className="w-full mb-6">
           <RadioGroup
             onValueChange={(value) => setSelectedType(value as Budget['type'])}
             className="grid grid-cols-3 gap-2 md:gap-4 font-semibold"

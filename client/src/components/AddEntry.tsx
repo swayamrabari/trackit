@@ -74,18 +74,18 @@ export default function AddEntry({ inSidebar = false }) {
 
   const handleAddNewCategory = async () => {
     const trimmedName = newCategoryName.trim();
-    
+
     // Validation: Check for empty values
     if (!trimmedName) {
       return; // Don't proceed if empty
     }
-    
+
     if (!type) {
       return; // Don't proceed if no type selected
     }
 
     const categoryName = trimmedName.toLowerCase();
-    
+
     // Check if category already exists
     if (relevantCategories.includes(categoryName)) {
       setCategory(categoryName);
@@ -106,7 +106,9 @@ export default function AddEntry({ inSidebar = false }) {
     setNewCategoryName('');
   };
 
-  const handleNewCategoryKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleNewCategoryKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (e.key === 'Enter') {
       e.preventDefault();
       handleAddNewCategory();
@@ -130,9 +132,25 @@ export default function AddEntry({ inSidebar = false }) {
         {inSidebar ? (
           <DialogTrigger asChild>
             <div className="transition-all font-medium w-full flex gap-2 hover:bg-secondary cursor-pointer items-center justify-start px-2.5 py-2 rounded-md text-foreground">
-              <svg width="22" height="23" viewBox="0 0 22 23" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-[20px] w-[22px]">
-                <path d="M4.29297 10.293C4.68349 9.90245 5.31651 9.90245 5.70703 10.293C6.09752 10.6835 6.09754 11.3165 5.70703 11.707L3.41406 14H9.6748C9.37938 14.6218 9.1733 15.2938 9.07227 16H3.41406L5.70703 18.293C6.09752 18.6835 6.09754 19.3165 5.70703 19.707C5.31652 20.0975 4.68348 20.0975 4.29297 19.707L0.292969 15.707C-0.097543 15.3165 -0.0975178 14.6835 0.292969 14.293L4.29297 10.293ZM12.293 0.29297C12.6835 -0.0975548 13.3165 -0.0975548 13.707 0.29297L17.707 4.29297C18.0975 4.6835 18.0975 5.31652 17.707 5.70703L13.707 9.70703C13.3165 10.0975 12.6835 10.0975 12.293 9.70703C11.9025 9.31652 11.9025 8.6835 12.293 8.29297L14.5859 6H1C0.44774 6 4.08113e-05 5.55225 0 5C0 4.44772 0.447715 4 1 4H14.5859L12.293 1.70703C11.9025 1.31652 11.9025 0.683497 12.293 0.29297Z" fill="currentColor"/>
-                <path d="M14 17H18M16 15V19M21 17C21 19.7614 18.7614 22 16 22C13.2386 22 11 19.7614 11 17C11 14.2386 13.2386 12 16 12C18.7614 12 21 14.2386 21 17Z" stroke="currentColor" strokeWidth="1.33333" strokeLinecap="round" strokeLinejoin="round"/>
+              <svg
+                width="22"
+                height="23"
+                viewBox="0 0 22 23"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="h-[20px] w-[22px]"
+              >
+                <path
+                  d="M4.29297 10.293C4.68349 9.90245 5.31651 9.90245 5.70703 10.293C6.09752 10.6835 6.09754 11.3165 5.70703 11.707L3.41406 14H9.6748C9.37938 14.6218 9.1733 15.2938 9.07227 16H3.41406L5.70703 18.293C6.09752 18.6835 6.09754 19.3165 5.70703 19.707C5.31652 20.0975 4.68348 20.0975 4.29297 19.707L0.292969 15.707C-0.097543 15.3165 -0.0975178 14.6835 0.292969 14.293L4.29297 10.293ZM12.293 0.29297C12.6835 -0.0975548 13.3165 -0.0975548 13.707 0.29297L17.707 4.29297C18.0975 4.6835 18.0975 5.31652 17.707 5.70703L13.707 9.70703C13.3165 10.0975 12.6835 10.0975 12.293 9.70703C11.9025 9.31652 11.9025 8.6835 12.293 8.29297L14.5859 6H1C0.44774 6 4.08113e-05 5.55225 0 5C0 4.44772 0.447715 4 1 4H14.5859L12.293 1.70703C11.9025 1.31652 11.9025 0.683497 12.293 0.29297Z"
+                  fill="currentColor"
+                />
+                <path
+                  d="M14 17H18M16 15V19M21 17C21 19.7614 18.7614 22 16 22C13.2386 22 11 19.7614 11 17C11 14.2386 13.2386 12 16 12C18.7614 12 21 14.2386 21 17Z"
+                  stroke="currentColor"
+                  strokeWidth="1.33333"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
               <span className="text-base">Add Entry</span>
             </div>
@@ -172,14 +190,18 @@ export default function AddEntry({ inSidebar = false }) {
             {entryTypes.map((etype) => (
               <Label
                 key={etype}
-                htmlFor={etype}
+                htmlFor={`add-entry-${etype}`}
                 className={cn(
                   `flex font-bold items-center justify-center rounded-md border-[1.5px] h-10 text-${etype}`,
                   type === etype &&
                     `bg-${etype}/10 border-${etype} transition-all duration-75`
                 )}
               >
-                <RadioGroupItem value={etype} id={etype} className="sr-only" />
+                <RadioGroupItem
+                  value={etype}
+                  id={`add-entry-${etype}`}
+                  className="sr-only"
+                />
                 {etype.charAt(0).toUpperCase() + etype.slice(1)}
               </Label>
             ))}
@@ -213,11 +235,7 @@ export default function AddEntry({ inSidebar = false }) {
                   </SelectItem>
                   <SelectSeparator />
                   {relevantCategories.map((cat: string) => (
-                    <SelectItem
-                      key={cat}
-                      value={cat}
-                      className="capitalize"
-                    >
+                    <SelectItem key={cat} value={cat} className="capitalize">
                       {cat}
                     </SelectItem>
                   ))}

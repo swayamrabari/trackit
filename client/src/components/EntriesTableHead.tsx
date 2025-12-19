@@ -18,6 +18,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import AddEntry from './AddEntry';
+import ExportDialog from './ExportDialog';
 import { useCategoriesStore } from '@/store/categoriesStore';
 import { Button } from '@/components/ui/button';
 import { Filter, FilterX, CalendarIcon, CheckIcon } from 'lucide-react';
@@ -181,6 +182,7 @@ export default function EntriesTableHead({
       <div className="flex gap-3">
         {showFilters && (
           <>
+            <ExportDialog />
             <Dialog onOpenChange={handleDialogOpenChange}>
               <DialogTrigger asChild>
                 <Button

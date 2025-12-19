@@ -14,6 +14,7 @@ import { EllipsisVertical, LogOut, Moon, Sun } from 'lucide-react';
 import { CategoryDialog } from './CategoryDialog';
 import { FeedbackDialog } from './FeedbackDialog';
 import { useTheme } from '@/hooks/use-theme';
+import ExportDialog from './ExportDialog';
 
 export default function SidebarNav() {
   const addBudget = useBudgetStore((s) => s.addBudget);
@@ -64,6 +65,7 @@ export default function SidebarNav() {
             <AddEntry inSidebar />
             <AddBudgetDialog onAdd={addBudget} inSidebar />
             <CategoryDialog />
+            <ExportDialog inSidebar />
           </div>
         </div>
       )}
