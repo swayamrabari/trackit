@@ -216,7 +216,7 @@ export default function ExportDialog({ inSidebar = false }) {
                 <SelectGroup>
                   <SelectItem value="all">All</SelectItem>
                   {type !== 'all' &&
-                    categories[type].map((cat) => (
+                    categories[type as keyof typeof categories].map((cat) => (
                       <SelectItem key={cat} value={cat}>
                         {cat.charAt(0).toUpperCase() + cat.slice(1)}
                       </SelectItem>
