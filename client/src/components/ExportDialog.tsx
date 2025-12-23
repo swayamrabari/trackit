@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -189,12 +190,14 @@ export default function ExportDialog({ inSidebar = false }) {
                 <SelectValue placeholder="Select Type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                {entryTypes.map((t) => (
-                  <SelectItem key={t} value={t} className="capitalize">
-                    {t}
-                  </SelectItem>
-                ))}
+                <SelectGroup>
+                  <SelectItem value="all">All</SelectItem>
+                  {entryTypes.map((etype) => (
+                    <SelectItem key={etype} value={etype}>
+                      {etype.charAt(0).toUpperCase() + etype.slice(1)}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>
@@ -210,13 +213,15 @@ export default function ExportDialog({ inSidebar = false }) {
                 <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {type !== 'all' &&
-                  categories[type as keyof typeof categories]?.map((c) => (
-                    <SelectItem key={c} value={c} className="capitalize">
-                      {c}
-                    </SelectItem>
-                  ))}
+                <SelectGroup>
+                  <SelectItem value="all">All</SelectItem>
+                  {type !== 'all' &&
+                    categories[type].map((cat) => (
+                      <SelectItem key={cat} value={cat}>
+                        {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                      </SelectItem>
+                    ))}
+                </SelectGroup>
               </SelectContent>
             </Select>
           </div>
