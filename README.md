@@ -18,20 +18,20 @@ TrackIt is a comprehensive personal finance management platform that helps users
 
 ## Features
 
-### 💰 Financial Management
+### Financial Management
 
 - **Entry Management**: Track income, expenses, investments, and savings with detailed categorization
 - **Budget Management**: Create and manage budgets with flexible time periods (monthly, quarterly, yearly)
 - **Category Management**: Organize transactions with custom categories
 - **Real-time Analytics**: Visualize financial data with interactive charts and progress indicators
 
-### 🤖 AI-Powered Assistant
+### AI-Powered Assistant
 
 - **Natural Language Queries**: Ask questions about your finances in plain English
 - **Smart Insights**: Get intelligent analysis of spending patterns and budget performance
 - **Function-Based Architecture**: Secure, controlled access to financial data through a catalog system
 
-### 🔐 Security & Authentication
+### Security & Authentication
 
 - **JWT Authentication**: Secure token-based authentication
 - **Google OAuth**: Quick sign-in with Google accounts
@@ -39,13 +39,13 @@ TrackIt is a comprehensive personal finance management platform that helps users
 - **Password Reset**: Self-service password recovery
 - **Role-Based Access**: Admin panel with user management capabilities
 
-### 📊 Data Visualization
+### Data Visualization
 
 - **Interactive Charts**: Visualize income, expenses, investments, and savings trends
 - **Progress Tracking**: Monitor budget utilization with real-time progress bars
 - **Time-based Filtering**: Filter data by month, quarter, year, or custom date ranges
 
-### 🎨 User Experience
+### User Experience
 
 - **Responsive Design**: Seamless experience across desktop, tablet, and mobile devices
 - **Dark Mode**: Eye-friendly dark theme support
@@ -323,8 +323,8 @@ For support, email support@trackit.com or open an issue in the repository.
 - [Recharts](https://recharts.org/) for data visualization
 - [OpenAI](https://openai.com/) for AI capabilities
 
-<!-- <div align="center">
+<div align="center">
 
-Made with ❤️ by the TrackIt team
+Made with  by Swayam Rabari
 
-</div> -->
+</div>

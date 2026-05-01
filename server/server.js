@@ -18,12 +18,13 @@ const requiredEnvVars = [
   'MONGOURI',
   'JWT_SECRET',
   'CLIENT_URL',
-  'SENDGRID_API_KEY',
+  'BREVO_API_KEY',
 ];
 
 const optionalEnvVars = [
   'OPENAI_API_KEY',
-  'EMAIL_FROM',
+  'BREVO_SENDER_EMAIL',
+  'BREVO_SENDER_NAME',
   'GOOGLE_CLIENT_ID',
   'GOOGLE_CLIENT_SECRET',
 ];
