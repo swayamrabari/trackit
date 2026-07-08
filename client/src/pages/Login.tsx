@@ -12,7 +12,8 @@ import { toast } from 'sonner';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, isLoading, clearError } = useAuthStore();
+  const [demoLoading, setDemoLoading] = useState(false);
+  const { login, isLoading, clearError, startDemo } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -21,7 +22,6 @@ export default function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearError();
-    // loading toast
     toast.loading('Logging in...', { id: 'login' });
 
     try {
@@ -32,6 +32,20 @@ export default function Login() {
       toast.error(err.response?.data?.message || 'Login Failed', {
         id: 'login',
       });
+    }
+  };
+
+  const handleDemo = async () => {
+    clearError();
+    setDemoLoading(true);
+    toast.loading('Setting up demo...', { id: 'demo' });
+    try {
+      await startDemo();
+      toast.success('Welcome to the demo!', { id: 'demo' });
+      navigate('/');
+    } catch (err: any) {
+      toast.error('Demo setup failed. Please try again.', { id: 'demo' });
+      setDemoLoading(false);
     }
   };
   return (
@@ -90,6 +104,23 @@ export default function Login() {
             Forgot Password?
           </Link>
         </p>
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">or</span>
+          </div>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full font-semibold"
+          disabled={isLoading || demoLoading}
+          onClick={handleDemo}
+        >
+          {demoLoading ? 'Setting up...' : 'Try Demo'}
+        </Button>
         <p className="mt-4 font-semibold text-center text-sm text-muted-foreground">
           Don't have an account?{' '}
           <Link to="/register" className="text-primary underline">

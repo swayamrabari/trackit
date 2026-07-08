@@ -1,12 +1,15 @@
 import { useState } from 'react';
+import { useAuthStore } from '@/store/authStore';
 import EntriesTableHead from '@/components/EntriesTableHead';
 import Summary from '../components/Summary';
 import EntriesTable from '@/components/EntriesTable';
 
 export default function Home() {
+  const { user } = useAuthStore();
+  const isDemo = user?.isDemo;
   const [filterType, setFilterType] = useState<
     'all' | 'month' | 'quarter' | 'year' | 'custom'
-  >('month');
+  >(isDemo ? 'all' : 'month');
   const [filterMonth, setFilterMonth] = useState<number | null>(null);
   const [filterYear, setFilterYear] = useState<number | null>(null);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);

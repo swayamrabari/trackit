@@ -10,7 +10,7 @@ exports.getEntries = async (req, res) => {
     res.status(200).json(entries);
   } catch (error) {
     logger.error('Error fetching entries', { error: error.message, stack: error.stack, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -30,7 +30,7 @@ exports.getEntry = async (req, res) => {
     res.status(200).json(entry);
   } catch (error) {
     logger.error('Error fetching entry', { error: error.message, stack: error.stack, entryId: req.params.entryId, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -61,7 +61,7 @@ exports.createEntry = async (req, res) => {
     res.status(201).json(newEntry);
   } catch (error) {
     logger.error('Error creating entry', { error: error.message, stack: error.stack, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -94,7 +94,7 @@ exports.updateEntry = async (req, res) => {
     res.status(200).json(entry);
   } catch (error) {
     logger.error('Error updating entry', { error: error.message, stack: error.stack, entryId: req.params.entryId, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -116,7 +116,7 @@ exports.deleteEntry = async (req, res) => {
     res.status(200).json({ message: 'Entry deleted' });
   } catch (error) {
     logger.error('Error deleting entry', { error: error.message, stack: error.stack, entryId: req.params.entryId, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 

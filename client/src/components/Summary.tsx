@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useEntriesStore } from '@/store/entriesStore';
+import { useAuthStore } from '@/store/authStore';
 import TimeFilterDialog from '@/components/TimeFilterDialog';
 
 interface SummaryProps {
@@ -14,12 +15,14 @@ interface SummaryProps {
 
 export default function Summary({ onFilterChange }: SummaryProps = {}) {
   const { entries, mainEntries } = useEntriesStore();
+  const { user } = useAuthStore();
+  const isDemo = user?.isDemo;
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1; // 1-12
   const currentYear = currentDate.getFullYear();
-  const [filterType, setFilterType] = useState('month');
-  const [filterMonth, setFilterMonth] = useState<number | null>(currentMonth);
-  const [filterYear, setFilterYear] = useState<number | null>(currentYear);
+  const [filterType, setFilterType] = useState(isDemo ? 'all' : 'month');
+  const [filterMonth, setFilterMonth] = useState<number | null>(isDemo ? null : currentMonth);
+  const [filterYear, setFilterYear] = useState<number | null>(isDemo ? null : currentYear);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 

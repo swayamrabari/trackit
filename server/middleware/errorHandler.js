@@ -12,10 +12,13 @@ const errorHandler = (err, req, res, next) => {
     ip: req.ip,
   });
 
-  res.status(statusCode).json({
-    message: err.message || 'Internal Server Error',
-    error: process.env.NODE_ENV === 'production' ? {} : err.stack,
-  });
+  const userMessage = statusCode === 429
+    ? err.message
+    : err.statusCode && err.statusCode < 500
+      ? err.message
+      : 'Something went wrong. Please try again.';
+
+  res.status(statusCode).json({ message: userMessage });
 };
 
 module.exports = errorHandler;

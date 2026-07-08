@@ -11,7 +11,7 @@ exports.getChatSessions = async (req, res) => {
     res.status(200).json(sessions);
   } catch (error) {
     logger.error('Error fetching chat sessions', { error: error.message, stack: error.stack, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -31,7 +31,7 @@ exports.getChatSession = async (req, res) => {
     res.status(200).json(session);
   } catch (error) {
     logger.error('Error fetching chat session', { error: error.message, stack: error.stack, sessionId: req.params.sessionId, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -49,7 +49,7 @@ exports.createChatSession = async (req, res) => {
     res.status(201).json(newSession);
   } catch (error) {
     logger.error('Error creating chat session', { error: error.message, stack: error.stack, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -108,7 +108,7 @@ exports.updateChatSession = async (req, res) => {
       }
     }
     
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -130,7 +130,7 @@ exports.deleteChatSession = async (req, res) => {
     res.status(200).json({ message: 'Chat session deleted' });
   } catch (error) {
     logger.error('Error deleting chat session', { error: error.message, stack: error.stack, sessionId: req.params.sessionId, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 

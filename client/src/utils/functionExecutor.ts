@@ -985,7 +985,7 @@ export async function executeFunction(
         if (!categoryExists) {
           result = {
             success: false,
-            message: `The category "${params.category}" does not exist for ${params.type}. Please add the category first using the addCategory function, or choose from existing categories: ${categories[categoryType]?.join(', ')}.`
+            message: `The category "${params.category}" does not exist for ${params.type}. Available categories: ${categories[categoryType]?.join(', ')}.`
           };
           break;
         }
@@ -1014,12 +1014,9 @@ export async function executeFunction(
             }
           };
         } catch (error: any) {
-          // Handle errors from entry creation
-          const errorMessage = error?.message || 'Failed to create entry';
           result = {
             success: false,
-            message: errorMessage,
-            error: errorMessage
+            message: 'Failed to create entry. Please try again.',
           };
         }
         break;
@@ -1055,7 +1052,7 @@ export async function executeFunction(
         if (!categoryExists) {
           result = {
             success: false,
-            message: `The category "${params.category}" does not exist for ${params.type}. Please add the category first using the addCategory function, or choose from existing categories: ${categories[categoryType]?.join(', ')}.`
+            message: `The category "${params.category}" does not exist for ${params.type}. Available categories: ${categories[categoryType]?.join(', ')}.`
           };
           break;
         }
@@ -1085,8 +1082,7 @@ export async function executeFunction(
           if (!createdBudget) {
             result = {
               success: false,
-              message: 'Budget creation may have failed. Please check if the budget was created.',
-              error: 'Budget not found in store after creation'
+              message: 'Failed to create budget. Please try again.',
             };
           } else {
             result = {
@@ -1101,12 +1097,9 @@ export async function executeFunction(
             };
           }
         } catch (error: any) {
-          // Handle errors from budget creation (e.g., duplicate budgets, network errors)
-          const errorMessage = error?.message || 'Failed to create budget';
           result = {
             success: false,
-            message: errorMessage,
-            error: errorMessage
+            message: 'Failed to create budget. Please try again.',
           };
         }
         break;
@@ -1179,9 +1172,7 @@ export async function executeFunction(
 
     const errorMessage = error instanceof FunctionExecutionError
       ? error.message
-      : error instanceof Error
-        ? error.message
-        : 'Unknown error occurred';
+      : 'An unexpected error occurred while processing your request.';
 
     return {
       success: false,

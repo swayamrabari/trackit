@@ -10,7 +10,7 @@ exports.getBudgets = async (req, res) => {
     res.status(200).json(budgets);
   } catch (error) {
     logger.error('Error fetching budgets', { error: error.message, stack: error.stack, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -30,7 +30,7 @@ exports.getBudget = async (req, res) => {
     res.status(200).json(budget);
   } catch (error) {
     logger.error('Error fetching budget', { error: error.message, stack: error.stack, budgetId: req.params.budgetId, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -64,7 +64,7 @@ exports.createBudget = async (req, res) => {
     res.status(201).json(newBudget);
   } catch (error) {
     logger.error('Error creating budget', { error: error.message, stack: error.stack, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -100,7 +100,7 @@ exports.updateBudget = async (req, res) => {
     res.status(200).json(budget);
   } catch (error) {
     logger.error('Error updating budget', { error: error.message, stack: error.stack, budgetId: req.params.budgetId, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -122,7 +122,7 @@ exports.deleteBudget = async (req, res) => {
     res.status(200).json({ message: 'Budget deleted' });
   } catch (error) {
     logger.error('Error deleting budget', { error: error.message, stack: error.stack, budgetId: req.params.budgetId, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 

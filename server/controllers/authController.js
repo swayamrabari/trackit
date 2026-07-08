@@ -8,6 +8,7 @@ const PasswordReset = require('../models/PasswordReset');
 const sendOtpMail = require('../utils/sendOtpMail');
 const sendPasswordResetMail = require('../utils/sendPasswordResetMail');
 const generateToken = require('../utils/generateToken');
+const seedDemoData = require('../scripts/seedDemoData');
 
 // Helper function to get cookie options
 const getCookieOptions = () => {
@@ -69,7 +70,7 @@ exports.registerUser = async (req, res) => {
     res.status(200).json({ message: 'OTP sent to email' });
   } catch (error) {
     logger.error('Error in register', { error: error.message, stack: error.stack });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -110,12 +111,13 @@ exports.verifyOtp = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role || 'user',
+        isDemo: user.isDemo || false,
       },
       token,
     });
   } catch (error) {
     logger.error('Error in verifyOtp', { error: error.message, stack: error.stack, email: req.body.email });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -139,7 +141,7 @@ exports.resendOtp = async (req, res) => {
     res.status(200).json({ message: 'New OTP resent to email' });
   } catch (error) {
     logger.error('Error in resendOtp', { error: error.message, stack: error.stack, email: req.body.email });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -168,12 +170,13 @@ exports.loginUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role || 'user',
+        isDemo: user.isDemo || false,
       },
       token,
     });
   } catch (error) {
     logger.error('Error in login', { error: error.message, stack: error.stack, email: req.body.email });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -212,6 +215,7 @@ exports.getCurrentUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role || 'user',
+        isDemo: user.isDemo || false,
       },
     });
   } catch (error) {
@@ -252,7 +256,61 @@ exports.getAllUserData = async (req, res) => {
     });
   } catch (error) {
     logger.error('Error fetching all user data', { error: error.message, stack: error.stack, userId: req.user?._id });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
+  }
+};
+
+// Start demo session (no auth required)
+exports.startDemo = async (req, res) => {
+  let demoUserId = null;
+  try {
+    const demoEmail = `demo-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@trackit.demo`;
+
+    const user = await User.create({
+      name: 'Demo User',
+      email: demoEmail,
+      isDemo: true,
+      role: 'user',
+      categories: {
+        income: ['salary', 'freelance', 'business revenue', 'interest earned', 'dividends', 'other', 'bonus', 'commission'],
+        expense: ['rent', 'groceries', 'dining out', 'transportation', 'entertainment', 'healthcare', 'utilities', 'subscriptions', 'miscellaneous', 'insurance', 'travel'],
+        investment: ['stocks', 'mutual funds', 'real estate', 'cryptocurrency', 'gold', 'commodities', 'other investments', 'bonds', 'ETFs'],
+        savings: ['emergency fund', 'retirement fund', 'fixed deposits', 'high-interest savings', 'travel savings', 'college fund', 'vacation fund'],
+      },
+    });
+
+    demoUserId = user._id;
+
+    try {
+      await seedDemoData(user._id);
+    } catch (seedError) {
+      await User.deleteOne({ _id: user._id });
+      throw seedError;
+    }
+
+    const token = generateToken(user);
+
+    const cookieOptions = getCookieOptions();
+    res.cookie('token', token, cookieOptions);
+
+    logger.info('Demo session started', { userId: user._id });
+
+    res.status(201).json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role || 'user',
+        isDemo: true,
+      },
+      token,
+    });
+  } catch (error) {
+    logger.error('Error starting demo', { error: error.message, stack: error.stack });
+    if (demoUserId) {
+      await User.deleteOne({ _id: demoUserId }).catch(() => {});
+    }
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -363,7 +421,7 @@ exports.verifyPasswordResetOtp = async (req, res) => {
     });
   } catch (error) {
     logger.error('Error in verifyPasswordResetOtp', { error: error.message, stack: error.stack, email: req.body.email });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -424,6 +482,6 @@ exports.resetPassword = async (req, res) => {
     res.status(200).json({ message: 'Password reset successfully' });
   } catch (error) {
     logger.error('Error in resetPassword', { error: error.message, stack: error.stack, email: req.body.email });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };

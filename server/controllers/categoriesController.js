@@ -23,7 +23,7 @@ exports.getCategories = async (req, res) => {
       stack: error.stack,
       userId: req.user?._id,
     });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -76,7 +76,7 @@ exports.addCategory = async (req, res) => {
       userId: req.user?._id,
       categoryType: req.body.categoryType,
     });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -126,7 +126,7 @@ exports.removeCategory = async (req, res) => {
       userId: req.user?._id,
       categoryType: req.body.categoryType,
     });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -160,6 +160,6 @@ exports.updateCategories = async (req, res) => {
       stack: error.stack,
       userId: req.user?._id,
     });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { entriesApi, Entry as ApiEntry } from '../api/entries';
 import { useAuthStore } from './authStore';
+import { toast } from 'sonner';
 
 export interface Entry {
   id: string;
@@ -184,7 +185,7 @@ export const useEntriesStore = create<
             try {
               await entriesApi.deleteEntry(entry._id);
             } catch (error) {
-              // Revert on error
+              toast.error('Failed to delete entry. Please try again.');
               set((state) => {
                 const newEntries = [...state.entries, entry].sort((a, b) =>
                   new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -232,7 +233,7 @@ export const useEntriesStore = create<
                 )),
               }));
             } catch (error) {
-              // Revert on error
+              toast.error('Failed to update entry. Please try again.');
               set((state) => {
                 const newEntries = state.entries.map((e) => (e.id === id ? oldEntry : e));
                 return {
