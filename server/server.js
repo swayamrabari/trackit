@@ -6,6 +6,9 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const logger = require('./utils/logger');
 const requestLogger = require('./middleware/requestLogger');
+const User = require('./models/User');
+const Entry = require('./models/Entries');
+const Budget = require('./models/Budgets');
 const {
   protect,
   errorHandler,
@@ -120,7 +123,7 @@ app.use('/api/admin', require('./routes/admin'));
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
+  message: { message: 'Too many requests. Please try again later.' },
 });
 app.use(limiter);
 app.use('/api/auth', require('./routes/auth'));
@@ -132,7 +135,7 @@ app.use('/api/categories', require('./routes/categories'));
 const assistantLimiter = rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 5,
-  message: 'Too many requests from this IP, please try again later.',
+  message: { message: 'You are sending requests too fast. Please wait a moment before asking another question.' },
 });
 app.use('/api/assistant', assistantLimiter, require('./routes/assistant'));
 
@@ -144,10 +147,31 @@ app.use((req, res, next) => {
 // Error handler (must be last)
 app.use(errorHandler);
 
+// Cleanup expired demo users
+const cleanupExpiredDemos = async () => {
+  try {
+    const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const expired = await User.find({ isDemo: true, createdAt: { $lt: cutoff } });
+    const ids = expired.map((u) => u._id);
+    if (ids.length > 0) {
+      await Promise.all([
+        Entry.deleteMany({ userId: { $in: ids } }),
+        Budget.deleteMany({ userId: { $in: ids } }),
+        User.deleteMany({ _id: { $in: ids } }),
+      ]);
+      logger.info(`Cleaned up ${ids.length} expired demo sessions`);
+    }
+  } catch (error) {
+    logger.error('Demo cleanup error', { message: error.message });
+  }
+};
+
 // Connect to database and start server
 const startServer = async () => {
   try {
     await connectDB();
+    await cleanupExpiredDemos();
+    setInterval(cleanupExpiredDemos, 6 * 60 * 60 * 1000);
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
       logger.info(`Server running on port ${PORT}`, {

@@ -164,7 +164,7 @@ DATA FORMATTING:
 
     if (!response || !response.choices || !response.choices[0]) {
       logger.error('Unexpected OpenAI response', { response });
-      return res.status(500).json({ error: 'Invalid response from OpenAI' });
+      return res.status(500).json({ error: 'Something went wrong. Please try again.' });
     }
 
     const message = response.choices[0].message;
@@ -179,8 +179,7 @@ DATA FORMATTING:
       if (!validation.isValid) {
         logger.error('Function validation failed', { functionName, errors: validation.errors });
         return res.status(400).json({
-          error: 'Invalid function parameters',
-          details: validation.errors,
+          error: 'Something went wrong. Please try again.',
         });
       }
 
@@ -232,7 +231,7 @@ DATA FORMATTING:
       });
     }
     
-    res.status(500).json({ error: 'Failed to fetch assistant response' });
+    res.status(500).json({ error: 'Something went wrong. Please try again.' });
   }
 }
 

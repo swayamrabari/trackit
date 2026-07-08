@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema(
     googleId: { type: String },
     provider: { type: String, enum: ['local', 'google'], default: 'local' },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
+    isDemo: { type: Boolean, default: false },
     categories: {
       income: [{ type: String }],
       expense: [{ type: String }],

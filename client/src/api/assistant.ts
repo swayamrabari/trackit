@@ -25,11 +25,9 @@ export const sendMessage = async (
     return response.data;
   } catch (error: any) {
     
-    // Return a more detailed error message
     const errorMessage = error?.response?.data?.message 
       || error?.response?.data?.error 
-      || error?.message 
-      || "Something went wrong. Please check if the server is running and your OpenAI API key is configured.";
+      || 'Something went wrong. Please try again.';
     
     return {
       type: "text",

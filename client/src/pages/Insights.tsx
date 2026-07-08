@@ -3,21 +3,24 @@ import { ExpenseChart } from '../components/charts/ExpenseChart';
 import { InvestmentChart } from '@/components/charts/InvestmentChart';
 import { SavingsChart } from '@/components/charts/SavingsChart';
 import { useState } from 'react';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'; // Adjust import path as needed
-import { Label } from '@/components/ui/label'; // Adjust import path as needed
+import { useAuthStore } from '@/store/authStore';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import TimeFilterDialog from '@/components/TimeFilterDialog';
 
 export default function Insights() {
+  const { user } = useAuthStore();
+  const isDemo = user?.isDemo;
   const [selectedChart, setSelectedChart] = useState('Income');
 
   // Time filter state
   const currentDate = new Date();
-  const currentMonth = currentDate.getMonth() + 1; // 1-12
+  const currentMonth = currentDate.getMonth() + 1;
   const currentYear = currentDate.getFullYear();
-  const [filterType, setFilterType] = useState('month');
-  const [filterMonth, setFilterMonth] = useState<number | null>(currentMonth);
-  const [filterYear, setFilterYear] = useState<number | null>(currentYear);
+  const [filterType, setFilterType] = useState(isDemo ? 'all' : 'month');
+  const [filterMonth, setFilterMonth] = useState<number | null>(isDemo ? null : currentMonth);
+  const [filterYear, setFilterYear] = useState<number | null>(isDemo ? null : currentYear);
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { categoriesApi, Categories } from '../api/categories';
 import { useAuthStore } from './authStore';
+import { toast } from 'sonner';
 
 interface CategoriesStore {
   categories: Categories;
@@ -108,7 +109,7 @@ export const useCategoriesStore = create<CategoriesStore>()(
           try {
             await categoriesApi.addCategory(categoryType, category);
           } catch (error) {
-            // Revert on error
+            toast.error('Failed to add category. Please try again.');
             set((state) => ({
               categories: {
                 ...state.categories,
@@ -144,7 +145,7 @@ export const useCategoriesStore = create<CategoriesStore>()(
           try {
             await categoriesApi.removeCategory(categoryType, category);
           } catch (error) {
-            // Revert on error
+            toast.error('Failed to remove category. Please try again.');
             set((state) => ({
               categories: {
                 ...state.categories,
@@ -165,7 +166,7 @@ export const useCategoriesStore = create<CategoriesStore>()(
           try {
             await categoriesApi.updateCategories(categories);
           } catch (error) {
-            // Could revert here if needed
+            toast.error('Failed to save categories. Please try again.');
           }
         }
       },

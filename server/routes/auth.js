@@ -12,12 +12,14 @@ const {
   forgotPassword,
   verifyPasswordResetOtp,
   resetPassword,
+  startDemo,
 } = require('../controllers/authController');
 
 router.post('/register', registerUser);
 router.post('/verify-otp', verifyOtp);
 router.post('/resend-otp', resendOtp);
 router.post('/login', loginUser);
+router.post('/demo', startDemo);
 router.post('/logout', logoutUser);
 router.get('/me', getCurrentUser);
 router.get('/data', protect, getAllUserData);

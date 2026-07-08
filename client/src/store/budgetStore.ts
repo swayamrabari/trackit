@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import { useEntriesStore } from './entriesStore';
 import { budgetsApi, Budget as ApiBudget } from '../api/budgets';
 import { useAuthStore } from './authStore';
+import { toast } from 'sonner';
 
 export interface Budget {
   id: string;
@@ -181,7 +182,7 @@ export const useBudgetStore = create<BudgetStore>()(
             try {
               await budgetsApi.deleteBudget(budget._id);
             } catch (error) {
-              // Revert on error
+              toast.error('Failed to delete budget. Please try again.');
               set((state) => ({
                 budgets: [...state.budgets, budget],
               }));
@@ -224,7 +225,7 @@ export const useBudgetStore = create<BudgetStore>()(
                 ),
               }));
             } catch (error) {
-              // Revert on error
+              toast.error('Failed to update budget. Please try again.');
               set((state) => ({
                 budgets: state.budgets.map((b) => (b.id === id ? oldBudget : b)),
               }));

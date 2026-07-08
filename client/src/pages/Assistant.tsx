@@ -428,11 +428,7 @@ export default function Assistant() {
       }
     } catch (error) {
       console.error('Error in handleAssistantResponse:', error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'There was an error processing your request. Please check the console for more details.';
-      fadeInResponse(errorMessage, assistantMsgId);
+      fadeInResponse('Something went wrong. Please try again.', assistantMsgId);
     }
   };
 

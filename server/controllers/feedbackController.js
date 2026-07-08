@@ -40,7 +40,7 @@ exports.createFeedback = async (req, res) => {
     });
   } catch (error) {
     logger.error('Error creating feedback', { error: error.message });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -53,7 +53,7 @@ exports.getUserFeedback = async (req, res) => {
     res.status(200).json({ feedback });
   } catch (error) {
     logger.error('Error fetching user feedback', { error: error.message });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 

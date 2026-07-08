@@ -5,6 +5,7 @@ export interface LoginResponse {
     name: string;
     email: string;
     role?: string;
+    isDemo?: boolean;
   };
   token: string;
 }
@@ -19,6 +20,7 @@ export interface verifyOtpResponse {
     name: string;
     email: string;
     role?: string;
+    isDemo?: boolean;
   };
   token: string;
 }
@@ -75,6 +77,11 @@ export const authApi = {
       email,
       otp,
     });
+    return response.data;
+  },
+
+  startDemo: async () => {
+    const response = await api.post<LoginResponse>('/auth/demo');
     return response.data;
   },
 

@@ -25,7 +25,7 @@ exports.getDashboardStats = async (req, res) => {
     });
   } catch (error) {
     logger.error('Error fetching dashboard stats', { error: error.message });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -61,7 +61,7 @@ exports.getAllUsers = async (req, res) => {
     res.status(200).json({ users: usersWithCounts });
   } catch (error) {
     logger.error('Error fetching users', { error: error.message });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -75,7 +75,7 @@ exports.getAllFeedback = async (req, res) => {
     res.status(200).json({ feedback });
   } catch (error) {
     logger.error('Error fetching feedback', { error: error.message });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 
@@ -102,7 +102,7 @@ exports.updateFeedbackStatus = async (req, res) => {
     res.status(200).json({ feedback });
   } catch (error) {
     logger.error('Error updating feedback status', { error: error.message });
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Something went wrong. Please try again.' });
   }
 };
 

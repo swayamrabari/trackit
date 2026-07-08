@@ -13,7 +13,8 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const { register, isLoading, clearError } = useAuthStore();
+  const [demoLoading, setDemoLoading] = useState(false);
+  const { register, isLoading, clearError, startDemo } = useAuthStore();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,7 +27,6 @@ export default function Register() {
     }
     try {
       await register(name, email, password);
-      // short message
       toast.success('Verification code sent to your mail!', {
         id: 'register',
       });
@@ -35,6 +35,20 @@ export default function Register() {
       toast.error(err.response?.data?.message || 'Something went wrong', {
         id: 'register',
       });
+    }
+  };
+
+  const handleDemo = async () => {
+    clearError();
+    setDemoLoading(true);
+    toast.loading('Setting up demo...', { id: 'demo' });
+    try {
+      await startDemo();
+      toast.success('Welcome to the demo!', { id: 'demo' });
+      navigate('/');
+    } catch (err: any) {
+      toast.error('Demo setup failed. Please try again.', { id: 'demo' });
+      setDemoLoading(false);
     }
   };
 
@@ -126,6 +140,23 @@ export default function Register() {
             {isLoading ? 'Registering...' : 'Register'}
           </Button>
         </form>
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-background px-2 text-muted-foreground">or</span>
+          </div>
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full font-semibold"
+          disabled={isLoading || demoLoading}
+          onClick={handleDemo}
+        >
+          {demoLoading ? 'Setting up...' : 'Try Demo'}
+        </Button>
         <p className="mt-4 font-semibold text-center text-sm text-muted-foreground">
           Already have an account?{' '}
           <Link to="/login" className="text-primary underline">

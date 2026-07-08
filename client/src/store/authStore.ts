@@ -119,6 +119,7 @@ interface User {
   name: string;
   email: string;
   role?: string;
+  isDemo?: boolean;
 }
 
 interface AuthState {
@@ -129,6 +130,7 @@ interface AuthState {
   error: string | null;
 
   login: (email: string, password: string) => Promise<void>;
+  startDemo: () => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   verifyOtp: (email: string, otp: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -160,6 +162,7 @@ export const useAuthStore = create<AuthState>()(
               name: user.name,
               email: user.email,
               role: user.role || 'user',
+              isDemo: user.isDemo || false,
             },
             token,
             isAuthenticated: true,
@@ -171,6 +174,32 @@ export const useAuthStore = create<AuthState>()(
         } catch (error: any) {
           set({
             error: error.response?.data?.message || 'Login failed',
+            isLoading: false,
+          });
+          throw error;
+        }
+      },
+
+      startDemo: async () => {
+        try {
+          set({ isLoading: true, error: null });
+          const { user, token } = await authApi.startDemo();
+          set({
+            user: {
+              _id: user.id,
+              name: user.name,
+              email: user.email,
+              role: user.role || 'user',
+              isDemo: user.isDemo || false,
+            },
+            token,
+            isAuthenticated: true,
+            isLoading: false,
+          });
+          await loadAllUserData();
+        } catch (error: any) {
+          set({
+            error: error.response?.data?.message || 'Demo start failed',
             isLoading: false,
           });
           throw error;
@@ -201,6 +230,7 @@ export const useAuthStore = create<AuthState>()(
               name: user.name,
               email: user.email,
               role: user.role || 'user',
+              isDemo: user.isDemo || false,
             },
             token,
             isAuthenticated: true,
@@ -242,6 +272,7 @@ export const useAuthStore = create<AuthState>()(
               name: user.name,
               email: user.email,
               role: user.role || 'user',
+              isDemo: user.isDemo || false,
             },
             isAuthenticated: true,
             isLoading: false,

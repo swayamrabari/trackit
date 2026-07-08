@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { chatApi, ChatSession as ApiChatSession } from '@/api/chat';
 import { useAuthStore } from './authStore';
+import { toast } from 'sonner';
 
 export interface ChatMessage {
   id: string;
@@ -159,6 +160,7 @@ export const useChatStore = create<ChatStore>()(
             set({ isSyncing: false });
           } catch {
             set({ isSyncing: false });
+            toast.error('Failed to save chat. Please try again.');
           } finally {
             syncTimeouts.delete(sessionId);
           }
@@ -213,7 +215,7 @@ export const useChatStore = create<ChatStore>()(
           try {
             await chatApi.deleteSession(session._id);
           } catch {
-            // Error deleting session - continue with local deletion
+            toast.error('Failed to delete chat session.');
           }
         }
 
